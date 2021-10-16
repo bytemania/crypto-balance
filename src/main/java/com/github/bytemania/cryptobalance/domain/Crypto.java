@@ -1,9 +1,9 @@
 package com.github.bytemania.cryptobalance.domain;
 
+import com.github.bytemania.cryptobalance.domain.util.Util;
 import lombok.Value;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -17,8 +17,8 @@ public class Crypto implements Comparable<Crypto>{
     public int compareTo(Crypto that) {
         return Comparator
                 .comparing(Crypto::getMarketCapPercentage, (d1, d2) -> {
-                    var v1 = BigDecimal.valueOf(d1).setScale(2, RoundingMode.HALF_UP);
-                    var v2 = BigDecimal.valueOf(d2).setScale(2, RoundingMode.HALF_UP);
+                    var v1 = Util.normalize(BigDecimal.valueOf(d1));
+                    var v2 = Util.normalize(BigDecimal.valueOf(d2));
                     return v1.compareTo(v2);
                 }).reversed()
                 .thenComparing(Crypto::getSymbol)
@@ -32,12 +32,8 @@ public class Crypto implements Comparable<Crypto>{
         if (o == null || getClass() != o.getClass()) return false;
         Crypto that = (Crypto) o;
 
-        var mcpThis = BigDecimal.valueOf(this.marketCapPercentage)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
-        var mcpThat = BigDecimal.valueOf(that.marketCapPercentage)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
+        var mcpThis = Util.normalize(BigDecimal.valueOf(this.marketCapPercentage)).doubleValue();
+        var mcpThat = Util.normalize(BigDecimal.valueOf(that.marketCapPercentage)).doubleValue();
 
         return Double.compare(mcpThis, mcpThat) == 0
                 && stableCoin == that.stableCoin
@@ -46,9 +42,7 @@ public class Crypto implements Comparable<Crypto>{
 
     @Override
     public int hashCode() {
-        var mcp = BigDecimal.valueOf(marketCapPercentage)
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
+        var mcp = Util.normalize(BigDecimal.valueOf(marketCapPercentage)).doubleValue();
 
         return Objects.hash(symbol, mcp, stableCoin);
     }

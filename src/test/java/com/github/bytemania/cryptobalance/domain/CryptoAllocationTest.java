@@ -10,10 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CryptoAllocationTest {
 
-    private static final CryptoAllocation BTC = CryptoAllocation.of("BTC", 51 , true, BigDecimal.valueOf(50));
-    private static final CryptoAllocation ETH = CryptoAllocation.of("ETH", 40 , true, BigDecimal.valueOf(40));
-    private static final CryptoAllocation WBTC = CryptoAllocation.of("WBTC", 1, false, BigDecimal.valueOf(1));
-    private static final CryptoAllocation ABTC = CryptoAllocation.of("ABTC", 1, true, BigDecimal.valueOf(1));
+    private static final CryptoAllocation BTC = CryptoAllocation.of("BTC", 51 , false,
+            BigDecimal.valueOf(50), CryptoAllocation.Operation.BUY, BigDecimal.TEN, BigDecimal.valueOf(40));
+    private static final CryptoAllocation ETH = CryptoAllocation.of("ETH", 40 , false,
+            BigDecimal.valueOf(40), CryptoAllocation.Operation.SELL, BigDecimal.valueOf(20), BigDecimal.valueOf(60));
+    private static final CryptoAllocation WBTC = CryptoAllocation.of("WBTC", 1, false,
+            BigDecimal.ONE, CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.ONE);
+    private static final CryptoAllocation ABTC = CryptoAllocation.of("ABTC", 1, true,
+            BigDecimal.ONE, CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.ONE);
 
     private static class BtcBuilder {
         static BtcBuilder of() {
@@ -37,6 +41,9 @@ class CryptoAllocationTest {
             return CryptoAllocation.of("BTC",
                     marketCapPercentage,
                     true,
+                    BigDecimal.valueOf(amountToInvest),
+                    CryptoAllocation.Operation.KEEP,
+                    BigDecimal.ZERO,
                     BigDecimal.valueOf(amountToInvest));
         }
     }
@@ -61,9 +68,11 @@ class CryptoAllocationTest {
         assertThat(WBTC.compareTo(ABTC)).isPositive();
         assertThat(ABTC.compareTo(WBTC)).isNegative();
         assertThat(BTC.compareTo(BTC)).isZero();
-        assertThat(ABTC.compareTo(CryptoAllocation.of("ABTC", 0, false, BigDecimal.valueOf(10))))
+        assertThat(ABTC.compareTo(CryptoAllocation.of("ABTC", 0, false,
+                BigDecimal.valueOf(10), CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.valueOf(10))))
                 .isPositive();
-        assertThat(ABTC.compareTo(CryptoAllocation.of("ABTC", 0, true, BigDecimal.valueOf(10))))
+        assertThat(ABTC.compareTo(CryptoAllocation.of("ABTC", 0, true,
+                BigDecimal.valueOf(10), CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.valueOf(10))))
                 .isPositive();
     }
 
@@ -98,8 +107,11 @@ class CryptoAllocationTest {
     @DisplayName("Should be equals for same object and same class ")
     void shouldBeEquals() {
         assertThat(BTC.equals(null)).isFalse();
-        assertThat(BTC.equals(CryptoAllocation.of("BTC", 51, true, BigDecimal.ONE))).isFalse();
-        assertThat(BTC.equals(CryptoAllocation.of("ETC", 51 , true, BigDecimal.valueOf(50)))).isFalse();
+        assertThat(BTC.equals(CryptoAllocation.of("BTC", 51, true, BigDecimal.ONE,
+                CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.ONE))).isFalse();
+        assertThat(BTC.equals(CryptoAllocation.of("ETC", 51 , true,
+                BigDecimal.valueOf(50), CryptoAllocation.Operation.KEEP, BigDecimal.ZERO, BigDecimal.valueOf(50))))
+                .isFalse();
         assertThat(BTC.equals("OTHER")).isFalse();
         assertThat(BTC.equals(BTC)).isTrue();
     }
