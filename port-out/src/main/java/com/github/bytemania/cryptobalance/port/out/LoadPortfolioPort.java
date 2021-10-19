@@ -4,6 +4,6 @@ import com.github.bytemania.cryptobalance.domain.CryptoState;
 
 import java.util.List;
 
-public interface LoadPortfolio {
+public interface LoadPortfolioPort {
     List<CryptoState> load();
 }

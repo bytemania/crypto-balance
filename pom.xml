@@ -22,9 +22,13 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<java.version>11</java.version>
 		<spring-boot-version>2.5.5</spring-boot-version>
+		<spring.version>5.3.10</spring.version>
 		<lombok.version>1.18.20</lombok.version>
+		<mapdb.version>3.0.8</mapdb.version>
+		<slf4j.version>1.7.32</slf4j.version>
 		<junit.version>5.7.2</junit.version>
 		<assertj.version>3.21.0</assertj.version>
+		<mockito.version>1.10.19</mockito.version>
 		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
 		<maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
 		<jacoco.maven.plugin.version>0.8.2</jacoco.maven.plugin.version>
@@ -32,13 +36,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-
-			<dependency>
-				<groupId>com.github.bytemania</groupId>
-				<artifactId>domain</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
-
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-parent</artifactId>
@@ -54,10 +51,28 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mapdb</groupId>
+				<artifactId>mapdb</artifactId>
+				<version>${mapdb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 
 			<dependency>
@@ -80,7 +95,15 @@
 				<version>${assertj.version}</version>
 				<scope>test</scope>
 			</dependency>
-		</dependencies>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+	</dependencies>
 	</dependencyManagement>
 
 	<build>
@@ -129,7 +152,7 @@
 											<limit>
 												<counter>COMPLEXITY</counter>
 												<value>COVEREDRATIO</value>
-												<minimum>0.5</minimum>
+												<minimum>0</minimum>
 											</limit>
 										</limits>
 									</rule>

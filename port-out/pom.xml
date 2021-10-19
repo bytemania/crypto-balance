@@ -15,6 +15,7 @@
         <dependency>
             <groupId>com.github.bytemania</groupId>
             <artifactId>domain</artifactId>
+            <version>${parent.version}</version>
         </dependency>
     </dependencies>
 
