@@ -107,7 +107,7 @@ class CoinMarketCapWebClientImplItTest {
                 .hasSize(2)
                 .containsExactly(
                         "Web client Started For Coin Market Cap",
-                        "Coin Market Cap called at=Thu Oct 21 21:00:11 IST 2021, currency=USD, numberOfCryptos=10, creditSpent=1");
+                        "Coin Market Cap called at=2021-10-21 20:00:11+0000, currency=USD, numberOfCryptos=10, creditSpent=1");
     }
 
     @Test

@@ -19,7 +19,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.netty.http.client.HttpClient;
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -91,8 +93,13 @@ public class CoinMarketCapWebClientImpl implements CoinMarketCapWebClient {
                 throw new CoinMarketCapClientException(errorMessage);
             }
 
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            String dateFormatted = simpleDateFormat.format(listing.getStatus().getTimestamp());
+
             log.info("Coin Market Cap called at={}, currency={}, numberOfCryptos={}, creditSpent={}",
-                    listing.getStatus().getTimestamp(),
+                    dateFormatted,
                     coinMarketCapWebClientConfig.getCurrency(),
                     coinMarketCapWebClientConfig.getNumberOfCryptos(),
                     listing.getStatus().getCreditCount());
