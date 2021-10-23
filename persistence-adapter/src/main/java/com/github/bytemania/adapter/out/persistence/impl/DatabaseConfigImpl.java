@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @ToString
 public class DatabaseConfigImpl implements DatabaseConfig {
     @Value("#{systemProperties['DB_FILE'] ?: 'portfolio.db'}")

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-class PersistenceAdapter implements LoadPortfolioPort, InitializingBean, DisposableBean {
+class PersistenceAdapter implements InitializingBean, DisposableBean, LoadPortfolioPort {
 
     private final Database database;
 
@@ -24,13 +24,13 @@ class PersistenceAdapter implements LoadPortfolioPort, InitializingBean, Disposa
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         database.connect();
         log.info("Database connected");
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         database.disconnect();
         log.info("Database disconnected");
     }

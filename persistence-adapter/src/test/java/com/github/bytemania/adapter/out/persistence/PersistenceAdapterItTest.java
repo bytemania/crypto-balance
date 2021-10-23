@@ -16,7 +16,13 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest(classes = {DatabaseConfig.class, DatabaseConfigImpl.class, Database.class, DatabaseImpl.class, PersistenceAdapter.class})
+@SpringBootTest(classes = {
+        DatabaseConfig.class,
+        DatabaseConfigImpl.class,
+        Database.class,
+        DatabaseImpl.class,
+        PersistenceAdapter.class
+})
 @TestPropertySource(properties = {"DB_FILE=db", "DB_MAP=map"})
 public class PersistenceAdapterItTest {
 
@@ -30,7 +36,6 @@ public class PersistenceAdapterItTest {
         Files.deleteIfExists(Path.of("db"));
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     @Autowired
     private LoadPortfolioPort persistenceAdapter;
 
