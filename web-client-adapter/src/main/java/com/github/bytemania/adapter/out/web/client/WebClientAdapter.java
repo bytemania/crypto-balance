@@ -2,7 +2,7 @@ package com.github.bytemania.adapter.out.web.client;
 
 import com.github.bytemania.adapter.out.web.client.exception.CoinMarketCapClientException;
 import com.github.bytemania.adapter.out.web.client.impl.Mapper;
-import com.github.bytemania.cryptobalance.domain.Crypto;
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;

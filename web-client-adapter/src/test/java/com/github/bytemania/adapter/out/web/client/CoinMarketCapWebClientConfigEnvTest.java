@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
         "WEB_CLIENT_AUTH_KEY=A_KEY",
         "WEB_CLIENT_TIMEOUT_MS=10",
         "WEB_CLIENT_NUMBER_OF_CRYPTOS=50",
-        "WEB_CLIENT_CURRENCY=EUR"
+        "APP_CURRENCY=EUR"
 })
 public class CoinMarketCapWebClientConfigEnvTest {
 
@@ -24,7 +24,7 @@ public class CoinMarketCapWebClientConfigEnvTest {
         System.setProperty("WEB_CLIENT_AUTH_KEY", "A_KEY");
         System.setProperty("WEB_CLIENT_TIMEOUT_MS", "10");
         System.setProperty("WEB_CLIENT_NUMBER_OF_CRYPTOS", "50");
-        System.setProperty("WEB_CLIENT_CURRENCY", "EUR");
+        System.setProperty("APP_CURRENCY", "EUR");
     }
 
     @SuppressWarnings({"UnusedDeclaration"})

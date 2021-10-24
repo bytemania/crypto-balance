@@ -16,7 +16,10 @@
 		<module>port-out</module>
 		<module>persistence-adapter</module>
         <module>web-client-adapter</module>
-    </modules>
+		<module>port-in</module>
+		<module>web-server-adapter</module>
+		<module>service</module>
+	</modules>
 
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>

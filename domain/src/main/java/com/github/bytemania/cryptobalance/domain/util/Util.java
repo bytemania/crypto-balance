@@ -11,4 +11,8 @@ public final class Util {
     public static BigDecimal normalize(BigDecimal amount) {
         return amount.setScale(2, RoundingMode.HALF_UP);
     }
+
+    public static double normalize(double percentage) {
+        return BigDecimal.valueOf(percentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
 }

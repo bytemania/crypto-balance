@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
         "WEB_CLIENT_AUTH_KEY=UNKNOWN_KEY",
         "WEB_CLIENT_TIMEOUT_MS=1000",
         "WEB_CLIENT_NUMBER_OF_CRYPTOS=10",
-        "WEB_CLIENT_CURRENCY=USD"
+        "APP_CURRENCY=USD"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CoinMarketCapWebClientImplItTest {
@@ -47,7 +47,7 @@ class CoinMarketCapWebClientImplItTest {
         System.setProperty("WEB_CLIENT_AUTH_KEY", "UNKNOWN_KEY");
         System.setProperty("WEB_CLIENT_TIMEOUT_MS", "1000");
         System.setProperty("WEB_CLIENT_NUMBER_OF_CRYPTOS", "10");
-        System.setProperty("WEB_CLIENT_CURRENCY", "USD");
+        System.setProperty("APP_CURRENCY", "USD");
     }
 
 

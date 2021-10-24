@@ -27,6 +27,6 @@ public class CoinMarketCapWebClientConfigImpl implements CoinMarketCapWebClientC
     @Value("#{systemProperties['WEB_CLIENT_NUMBER_OF_CRYPTOS'] ?: '100'}")
     int numberOfCryptos;
 
-    @Value("#{systemProperties['WEB_CLIENT_CURRENCY'] ?: 'USD'}")
+    @Value("#{systemProperties['APP_CURRENCY'] ?: 'USD'}")
     String currency;
 }

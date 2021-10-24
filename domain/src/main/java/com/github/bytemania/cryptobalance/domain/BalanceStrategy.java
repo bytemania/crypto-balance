@@ -1,7 +1,7 @@
 package com.github.bytemania.cryptobalance.domain;
 
-import java.util.List;
+import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
 
 public interface BalanceStrategy {
-    List<CryptoAllocation> allocate();
+    AllocationResult allocate();
 }

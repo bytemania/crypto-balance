@@ -2,7 +2,7 @@ package com.github.bytemania.adapter.out.web.client.impl;
 
 import com.github.bytemania.adapter.out.web.client.Fixture;
 import com.github.bytemania.adapter.out.web.client.dto.Listing;
-import com.github.bytemania.cryptobalance.domain.Crypto;
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

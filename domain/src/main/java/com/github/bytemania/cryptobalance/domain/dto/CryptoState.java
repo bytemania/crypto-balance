@@ -1,4 +1,4 @@
-package com.github.bytemania.cryptobalance.domain;
+package com.github.bytemania.cryptobalance.domain.dto;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;

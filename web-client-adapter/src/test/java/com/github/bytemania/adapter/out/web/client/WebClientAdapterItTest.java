@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "WEB_CLIENT_AUTH_KEY=UNKNOWN_KEY",
         "WEB_CLIENT_TIMEOUT_MS=1000",
         "WEB_CLIENT_NUMBER_OF_CRYPTOS=10",
-        "WEB_CLIENT_CURRENCY=USD"
+        "APP_CURRENCY=USD"
 })
 class WebClientAdapterItTest {
 
@@ -42,7 +42,7 @@ class WebClientAdapterItTest {
         System.setProperty("WEB_CLIENT_AUTH_KEY", "UNKNOWN_KEY");
         System.setProperty("WEB_CLIENT_TIMEOUT_MS", "1000");
         System.setProperty("WEB_CLIENT_NUMBER_OF_CRYPTOS", "10");
-        System.setProperty("WEB_CLIENT_CURRENCY", "USD");
+        System.setProperty("APP_CURRENCY", "USD");
     }
 
     private static MockWebServer mockBackEnd;

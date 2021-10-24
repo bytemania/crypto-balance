@@ -1,4 +1,4 @@
-package com.github.bytemania.cryptobalance.domain;
+package com.github.bytemania.cryptobalance.domain.dto;
 
 import com.github.bytemania.cryptobalance.domain.util.Util;
 import lombok.Value;
