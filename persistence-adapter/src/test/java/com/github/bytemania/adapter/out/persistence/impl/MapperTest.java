@@ -1,6 +1,6 @@
 package com.github.bytemania.adapter.out.persistence.impl;
 
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

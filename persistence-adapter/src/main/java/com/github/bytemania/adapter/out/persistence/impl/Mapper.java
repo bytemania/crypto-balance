@@ -1,6 +1,6 @@
 package com.github.bytemania.adapter.out.persistence.impl;
 
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

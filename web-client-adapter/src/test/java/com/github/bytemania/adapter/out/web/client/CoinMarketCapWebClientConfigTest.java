@@ -16,7 +16,7 @@ public class CoinMarketCapWebClientConfigTest {
         System.clearProperty("WEB_CLIENT_AUTH_KEY");
         System.clearProperty("WEB_CLIENT_TIMEOUT_MS");
         System.clearProperty("WEB_CLIENT_NUMBER_OF_CRYPTOS");
-        System.clearProperty("WEB_CLIENT_CURRENCY");
+        System.clearProperty("APP_CURRENCY");
     }
 
     @SuppressWarnings({"UnusedDeclaration"})

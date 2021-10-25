@@ -2,7 +2,7 @@ package com.github.bytemania.adapter.out.web.client;
 
 
 import com.github.bytemania.adapter.out.web.client.exception.CoinMarketCapClientException;
-import com.github.bytemania.cryptobalance.domain.Crypto;
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;

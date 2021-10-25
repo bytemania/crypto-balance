@@ -1,7 +1,7 @@
 package com.github.bytemania.adapter.out.persistence;
 
 import com.github.bytemania.adapter.out.persistence.impl.Mapper;
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPort;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;

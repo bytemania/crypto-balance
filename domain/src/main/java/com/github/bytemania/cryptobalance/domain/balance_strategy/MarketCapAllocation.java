@@ -1,9 +1,10 @@
 package com.github.bytemania.cryptobalance.domain.balance_strategy;
 
 import com.github.bytemania.cryptobalance.domain.BalanceStrategy;
-import com.github.bytemania.cryptobalance.domain.Crypto;
-import com.github.bytemania.cryptobalance.domain.CryptoAllocation;
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import com.github.bytemania.cryptobalance.domain.util.Util;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -53,11 +54,12 @@ public class MarketCapAllocation implements BalanceStrategy {
         allocateNonStableCoin(cryptos, minValueToAllocate);
         allocateNonUsedCoinsToSell();
         Collections.sort(allocation);
+
     }
 
     @Override
-    public List<CryptoAllocation> allocate() {
-        return allocation;
+    public AllocationResult allocate() {
+        return AllocationResult.of(amountToInvest, rest, allocation);
     }
 
     private void allocateStableCoin(Crypto stableCoin, BigDecimal minValueToAllocate) {

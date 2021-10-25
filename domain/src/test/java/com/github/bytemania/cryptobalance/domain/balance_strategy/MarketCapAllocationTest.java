@@ -1,8 +1,8 @@
 package com.github.bytemania.cryptobalance.domain.balance_strategy;
 
-import com.github.bytemania.cryptobalance.domain.Crypto;
-import com.github.bytemania.cryptobalance.domain.CryptoAllocation;
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -107,11 +107,11 @@ class MarketCapAllocationTest {
     @DisplayName("Should allocate all to stableCoin if amount to invest is lower than minimum")
     void shouldAllocateAllToStableCoinIfAmountToInvestIsLowerThanMinimum() {
         var moreMinThanAmountToInvest = createMarketCapAllocation(20, 1000);
-        assertThat(moreMinThanAmountToInvest.allocate()).isEqualTo(List.of(
+        assertThat(moreMinThanAmountToInvest.allocate().getCryptos()).isEqualTo(List.of(
                 createAllocation("BUSD", 100, true,100)));
 
         var sameAmountToInvestThanMin = createMarketCapAllocation(20, 100);
-        assertThat(sameAmountToInvestThanMin.allocate()).isEqualTo(List.of(
+        assertThat(sameAmountToInvestThanMin.allocate().getCryptos()).isEqualTo(List.of(
                 createAllocation("BUSD", 100, true, 100)));
     }
 
@@ -119,7 +119,7 @@ class MarketCapAllocationTest {
     @DisplayName("Should full allocate if the stable and the list get 100% allocation and money is left")
     void shouldAllocateAllCoinsAndMoneyIsLeft() {
         var fullyAllocation = createMarketCapAllocation(2, 1);
-        assertThat(fullyAllocation.allocate()).containsExactly(
+        assertThat(fullyAllocation.allocate().getCryptos()).containsExactly(
                 createAllocation("BTC", 55.57, false, 55.57),
                 createAllocation("ETH", 28.03, false, 28.03),
                 createAllocation("ADA", 8.38, false, 8.38),
@@ -128,12 +128,12 @@ class MarketCapAllocationTest {
                 createAllocation("XRP", 1.0, false, 1.00)
         );
 
-        var allocatedPercentage = fullyAllocation.allocate().stream()
+        var allocatedPercentage = fullyAllocation.allocate().getCryptos().stream()
                 .map(CryptoAllocation::getMarketCapPercentage)
                 .reduce(Double::sum)
                 .get();
 
-        var amountInvested = fullyAllocation.allocate().stream()
+        var amountInvested = fullyAllocation.allocate().getCryptos().stream()
                 .map(CryptoAllocation::getAmountToInvest)
                 .reduce(BigDecimal::add)
                 .get();
@@ -141,25 +141,27 @@ class MarketCapAllocationTest {
         assertThat(allocatedPercentage).isCloseTo(99, Offset.offset(0.001));
         assertThat(amountInvested).isCloseTo(BigDecimal.valueOf(99), Offset.offset(BigDecimal.valueOf(0.001)));
         assertThat(fullyAllocation.getRest()).isCloseTo(BigDecimal.ONE, Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(fullyAllocation.allocate().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
+        assertThat(fullyAllocation.allocate().getRest()).isCloseTo(BigDecimal.ONE, Offset.offset(BigDecimal.valueOf(0.001)));
+        assertThat(fullyAllocation.allocate().getAmountToInvest()).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
+        assertThat(fullyAllocation.allocate().getCryptos().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("Should full allocate Part of Portfolio")
     void shouldAllocatePartOfPortfolio() {
         var partialAllocation = createMarketCapAllocation(20, 10);
-        assertThat(partialAllocation.allocate()).containsExactly(
+        assertThat(partialAllocation.allocate().getCryptos()).containsExactly(
                 createAllocation("BTC", 55.57, false, 55.57),
                 createAllocation("ETH", 24.43, false, 24.43),
                 createAllocation("BUSD", 20.0, true, 20.00)
         );
 
-        var allocatedPercentage = partialAllocation.allocate().stream()
+        var allocatedPercentage = partialAllocation.allocate().getCryptos().stream()
                 .map(CryptoAllocation::getMarketCapPercentage)
                 .reduce(Double::sum)
                 .get();
 
-        var amountInvested = partialAllocation.allocate().stream()
+        var amountInvested = partialAllocation.allocate().getCryptos().stream()
                 .map(CryptoAllocation::getAmountToInvest)
                 .reduce(BigDecimal::add)
                 .get();
@@ -167,7 +169,9 @@ class MarketCapAllocationTest {
         assertThat(allocatedPercentage).isEqualTo(100);
         assertThat(amountInvested).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
         assertThat(partialAllocation.getRest()).isEqualTo(BigDecimal.ZERO);
-        assertThat(partialAllocation.allocate().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
+        assertThat(partialAllocation.allocate().getRest()).isCloseTo(BigDecimal.ZERO, Offset.offset(BigDecimal.valueOf(0.001)));
+        assertThat(partialAllocation.allocate().getAmountToInvest()).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
+        assertThat(partialAllocation.allocate().getCryptos().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
     }
 
     @Test
@@ -183,7 +187,7 @@ class MarketCapAllocationTest {
 
         var marketCapAllocation = createMarketCapAllocation(2, 100, 1, cap, state);
         var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations, state, 1);
+        assertRebalance(allocations.getCryptos(), state, 1);
     }
 
     @Test
@@ -200,7 +204,7 @@ class MarketCapAllocationTest {
 
         var marketCapAllocation = createMarketCapAllocation(20, 100, 10, cap, state);
         var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations, state, 1);
+        assertRebalance(allocations.getCryptos(), state, 1);
     }
 
     @Test
@@ -217,11 +221,11 @@ class MarketCapAllocationTest {
 
         var marketCapAllocation = createMarketCapAllocation(20, 100, 10, cap, state);
         var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations, state, 1);
-        assertThat(allocations.get(0)).isEqualTo(CryptoAllocation.of("BUSD", 20.0, true,
+        assertRebalance(allocations.getCryptos(), state, 1);
+        assertThat(allocations.getCryptos().get(0)).isEqualTo(CryptoAllocation.of("BUSD", 20.0, true,
                 BigDecimal.valueOf(82.00), CryptoAllocation.Operation.BUY, BigDecimal.valueOf(72.00),
                 BigDecimal.valueOf(10.00)));
-        assertThat(allocations.subList(1, allocations.size() - 1).stream()
+        assertThat(allocations.getCryptos().subList(1, allocations.getCryptos().size() - 1).stream()
                 .map(CryptoAllocation::getRebalanceOperation)
                 .collect(Collectors.toSet())).isEqualTo(Set.of(CryptoAllocation.Operation.SELL));
     }
@@ -234,8 +238,8 @@ class MarketCapAllocationTest {
 
         var marketCapAllocation = createMarketCapAllocation(100, 0, 10, cap, state);
         var allocations =  marketCapAllocation.allocate();
-        assertThat(allocations.size()).isEqualTo(1);
-        var allocation = allocations.get(0);
+        assertThat(allocations.getCryptos().size()).isEqualTo(1);
+        var allocation = allocations.getCryptos().get(0);
         assertThat(allocation.getSymbol()).isEqualTo("BUSD");
         assertThat(allocation.getMarketCapPercentage()).isEqualTo(100);
         assertThat(allocation.isStableCoin()).isTrue();

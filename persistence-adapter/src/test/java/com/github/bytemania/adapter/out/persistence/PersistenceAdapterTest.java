@@ -1,6 +1,6 @@
 package com.github.bytemania.adapter.out.persistence;
 
-import com.github.bytemania.cryptobalance.domain.CryptoState;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import nl.altindag.log.LogCaptor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;

@@ -1,5 +1,6 @@
 package com.github.bytemania.cryptobalance.domain;
 
+import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
