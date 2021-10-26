@@ -1,0 +1,6 @@
+spring:
+  logging:
+    level:
+      root: DEBUG
+      org.springframework.web: TRACE
+      com.github.bytemania.cryptobalance: DEBUG
