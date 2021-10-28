@@ -1,9 +1,12 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server;
 
-import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.AllocationControllerConfigImpl;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.ControllerConfigImpl;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.domain.util.Util;
-import com.github.bytemania.cryptobalance.port.in.CreateAllocation;
+import com.github.bytemania.cryptobalance.port.in.CreateAllocationPortIn;
+import nl.altindag.log.LogCaptor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,8 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AllocationController.class)
 @ContextConfiguration(classes = {
         AllocationController.class,
-        AllocationControllerConfig.class,
-        AllocationControllerConfigImpl.class,
+        ControllerConfig.class,
+        ControllerConfigImpl.class,
         GlobalExceptionHandler.class
 })
 class AllocationControllerItTest {
@@ -35,13 +39,25 @@ class AllocationControllerItTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CreateAllocation createAllocation;
+    private CreateAllocationPortIn createAllocationPortIn;
+
+    private LogCaptor logCaptor;
+
+    @BeforeEach
+    void beforeEach() {
+        logCaptor = LogCaptor.forClass(AllocationController.class);
+    }
+
+    @AfterEach
+    void afterEach() {
+        logCaptor.close();
+    }
 
     @Test
     @DisplayName("Should return Allocation From Service")
     void shouldReturnAllocationFromService() throws Throwable {
         var stableCoin = Crypto.of("USDT", 20.0, true);
-        given(createAllocation.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
+        given(createAllocationPortIn.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
                 eq(Util.normalize(BigDecimal.ONE))))
                 .willReturn(Fixture.allocationResult);
 
@@ -83,13 +99,19 @@ class AllocationControllerItTest {
                         "       \"rebalanceToInvest\":0.0," +
                         "       \"currentInvested\":20.0}]" +
                         "   }\n"));
+
+        assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        assertThat(logCaptor.getInfoLogs())
+                .hasSize(1)
+                .containsExactly("allocate called with stableCryptoSymbol:USDT, stableCryptoPercentage:20.0, valueToInvest:21.0, minValueToAllocate:1.0");
     }
 
     @Test
     @DisplayName("Should process A ValidationError")
     void shouldProcessAValidationError() throws Throwable {
         var stableCoin = Crypto.of("USDT", 20.0, true);
-        given(createAllocation.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
+        given(createAllocationPortIn.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
                 eq(Util.normalize(BigDecimal.ONE))))
                 .willReturn(Fixture.allocationResult);
 
@@ -108,13 +130,19 @@ class AllocationControllerItTest {
                         "\"error\":\"Validation Error\"," +
                         "\"message\":\"minValueToAllocate must be <= valueToInvest value: 100.0 valueToInvest: 21.0\"," +
                         "\"path\":\"/allocate\"}\n"));
+
+        assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        assertThat(logCaptor.getInfoLogs())
+                .hasSize(1)
+                .containsExactly("allocate called with stableCryptoSymbol:USDT, stableCryptoPercentage:20.0, valueToInvest:21.0, minValueToAllocate:100.0");
     }
 
     @Test
     @DisplayName("Should process A IllegalStateException")
     void shouldProcessIllegalStateException() throws Throwable {
         var stableCoin = Crypto.of("USDT", 20.0, true);
-        given(createAllocation.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
+        given(createAllocationPortIn.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
                 eq(Util.normalize(BigDecimal.ONE))))
                 .willThrow(new IllegalStateException("Invalid State"));
 
@@ -133,13 +161,19 @@ class AllocationControllerItTest {
                         "\"error\":\"Service Error\"," +
                         "\"message\":\"Invalid State\"," +
                         "\"path\":\"/allocate\"}\n"));
+
+        assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        assertThat(logCaptor.getInfoLogs())
+                .hasSize(1)
+                .containsExactly("allocate called with stableCryptoSymbol:USDT, stableCryptoPercentage:20.0, valueToInvest:21.0, minValueToAllocate:1.0");
     }
 
     @Test
     @DisplayName("Should process An UnexpectedError")
     void shouldProcessAnUnexpectedError() throws Throwable {
         var stableCoin = Crypto.of("USDT", 20.0, true);
-        given(createAllocation.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
+        given(createAllocationPortIn.allocate(eq(stableCoin), eq(Util.normalize(BigDecimal.valueOf(21))),
                 eq(Util.normalize(BigDecimal.ONE))))
                 .willThrow(new RuntimeException("Runtime Error"));
 
@@ -158,6 +192,12 @@ class AllocationControllerItTest {
                         "\"error\":\"Server Error\"," +
                         "\"message\":\"Runtime Error\"," +
                         "\"path\":\"/allocate\"}\n"));
+
+        assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        assertThat(logCaptor.getInfoLogs())
+                .hasSize(1)
+                .containsExactly("allocate called with stableCryptoSymbol:USDT, stableCryptoPercentage:20.0, valueToInvest:21.0, minValueToAllocate:1.0");
     }
 
     @Test
@@ -174,6 +214,8 @@ class AllocationControllerItTest {
                         "\"error\":\"Server Error\"," +
                         "\"message\":\"Required request parameter 'stableCryptoSymbol' for method parameter type String is not present\"," +
                         "\"path\":\"/allocate\"}\n"));
+
+        assertThat(logCaptor.getLogs()).isEmpty();
     }
 
 }

@@ -3,9 +3,9 @@ package com.github.bytemania.cryptobalance.service;
 import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
-import com.github.bytemania.cryptobalance.port.in.CreateAllocation;
-import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPort;
-import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPort;
+import com.github.bytemania.cryptobalance.port.in.CreateAllocationPortIn;
+import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPortOut;
+import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPortOut;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,16 +23,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest(classes = {CreateAllocationService.class, LoadCoinMarketCapPort.class, LoadPortfolioPort.class})
+@SpringBootTest(classes = {CreateAllocationService.class, LoadCoinMarketCapPortOut.class, LoadPortfolioPortOut.class})
 class CreateAllocationServiceItTest {
 
     @MockBean
-    private LoadCoinMarketCapPort loadCoinMarketCapPort;
+    private LoadCoinMarketCapPortOut loadCoinMarketCapPortOut;
     @MockBean
-    private LoadPortfolioPort loadPortfolioPort;
+    private LoadPortfolioPortOut loadPortfolioPortOut;
 
     @Autowired
-    private CreateAllocation createAllocation;
+    private CreateAllocationPortIn createAllocationPortIn;
 
     private LogCaptor logCaptor;
 
@@ -53,14 +53,14 @@ class CreateAllocationServiceItTest {
         var coinMarketCap = List.of(Crypto.of("BTC", 55.57, false));
         var state = List.of(CryptoState.of("BTC", BigDecimal.valueOf(100)));
 
-        given(loadCoinMarketCapPort.load()).willReturn(coinMarketCap);
-        given(loadPortfolioPort.load()).willReturn(state);
+        given(loadCoinMarketCapPortOut.load()).willReturn(coinMarketCap);
+        given(loadPortfolioPortOut.load()).willReturn(state);
 
         var stableCrypto = Crypto.of("BUSD", 20.0, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
-        AllocationResult result = createAllocation.allocate(stableCrypto, amountToInvest, minAmountToAllocate);
+        AllocationResult result = createAllocationPortIn.allocate(stableCrypto, amountToInvest, minAmountToAllocate);
 
         assertThat(result).isNotNull();
 
@@ -77,13 +77,13 @@ class CreateAllocationServiceItTest {
     @Test
     @DisplayName("Should Fail if CoinMarketCapFails")
     void shouldFailIfCoinMarketCapFail() {
-        given(loadCoinMarketCapPort.load()).willThrow(new IllegalStateException("Cannot connect CoinMarketCap"));
+        given(loadCoinMarketCapPortOut.load()).willThrow(new IllegalStateException("Cannot connect CoinMarketCap"));
 
         var stableCrypto = Crypto.of("BUSD", 20.0, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
-        assertThatThrownBy(() -> createAllocation.allocate(stableCrypto, amountToInvest, minAmountToAllocate))
+        assertThatThrownBy(() -> createAllocationPortIn.allocate(stableCrypto, amountToInvest, minAmountToAllocate))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Cannot connect CoinMarketCap");
 
@@ -103,14 +103,14 @@ class CreateAllocationServiceItTest {
 
         var coinMarketCap = List.of(Crypto.of("BTC", 55.57, false));
 
-        given(loadCoinMarketCapPort.load()).willReturn(coinMarketCap);
-        given(loadPortfolioPort.load()).willThrow(new IllegalStateException("Cannot Connect Portfolio"));
+        given(loadCoinMarketCapPortOut.load()).willReturn(coinMarketCap);
+        given(loadPortfolioPortOut.load()).willThrow(new IllegalStateException("Cannot Connect Portfolio"));
 
         var stableCrypto = Crypto.of("BUSD", 20.0, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
-        assertThatThrownBy(() -> createAllocation.allocate(stableCrypto, amountToInvest, minAmountToAllocate))
+        assertThatThrownBy(() -> createAllocationPortIn.allocate(stableCrypto, amountToInvest, minAmountToAllocate))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Cannot Connect Portfolio");
 

@@ -1,9 +1,11 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server.impl;
 
 import com.github.bytemania.cryptobalance.adapter.in.web.server.Fixture;
-import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.Allocation;
-import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.Response;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.allocation.Allocation;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.allocation.Response;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.portfolio.Crypto;
 import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -74,5 +76,49 @@ class MapperTest {
         assertThat(response.getCryptos()).isEmpty();
     }
 
+    @Test
+    @DisplayName("Should translate a Portfolio")
+    void shouldTranslateAPortfolio() {
+        var portfolio = Mapper.fromCryptoStateList("USD", Fixture.cryptoState);
+        assertThat(portfolio).isNotNull();
+        assertThat(portfolio.getCurrency()).isEqualTo("USD");
+        assertThat(portfolio.getTotalAmountInvested()).isEqualTo(1200.0);
+        assertThat(portfolio.getCryptos()).containsExactly(
+                Crypto.builder()
+                        .symbol("USDT")
+                        .amountInvested(200.0)
+                        .build(),
+                Crypto.builder()
+                        .symbol("BTC")
+                        .amountInvested(1000.0)
+                        .build()
+        );
+    }
+
+    @Test
+    @DisplayName("Should translate a empty Portfolio")
+    void shouldTranslateAEmptyPortfolio() {
+        var portfolio = Mapper.fromCryptoStateList("USD", List.of());
+        assertThat(portfolio).isNotNull();
+        assertThat(portfolio.getCurrency()).isEqualTo("USD");
+        assertThat(portfolio.getTotalAmountInvested()).isEqualTo(0.0);
+        assertThat(portfolio.getCryptos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should translate a Crypto")
+    void shouldTranslateACrypto() {
+        CryptoState cryptoState = Mapper.fromCrypto(Crypto.builder().symbol("ETH").amountInvested(13).build());
+        assertThat(cryptoState.getSymbol()).isEqualTo("ETH");
+        assertThat(cryptoState.getInvested().doubleValue()).isEqualTo(13.00);
+
+        cryptoState = Mapper.fromCrypto(Crypto.builder().symbol("ETH").amountInvested(13.004).build());
+        assertThat(cryptoState.getSymbol()).isEqualTo("ETH");
+        assertThat(cryptoState.getInvested().doubleValue()).isEqualTo(13.00);
+
+        cryptoState = Mapper.fromCrypto(Crypto.builder().symbol("ETH").amountInvested(13.005).build());
+        assertThat(cryptoState.getSymbol()).isEqualTo("ETH");
+        assertThat(cryptoState.getInvested().doubleValue()).isEqualTo(13.01);
+    }
 
 }

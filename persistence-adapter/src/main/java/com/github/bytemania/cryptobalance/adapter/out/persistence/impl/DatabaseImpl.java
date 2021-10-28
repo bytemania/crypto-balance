@@ -4,11 +4,13 @@ import com.github.bytemania.cryptobalance.adapter.out.persistence.Database;
 import com.github.bytemania.cryptobalance.adapter.out.persistence.DatabaseConfig;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 @Component
@@ -26,6 +28,28 @@ public class DatabaseImpl implements Database {
     }
 
     public ConcurrentMap<String, BigDecimal> load() {
+        return getTable();
+    }
+
+    @Override
+    public void remove(ConcurrentLinkedQueue<String> cryptoSymbols) {
+        var map = getTable();
+        map.keySet().removeAll(cryptoSymbols);
+        db.commit();
+    }
+
+    @Override
+    public void update(ConcurrentMap<String, BigDecimal> cryptos) {
+        var map = getTable();
+        map.putAll(cryptos);
+        db.commit();
+    }
+
+    public void disconnect() {
+        db.close();
+    }
+
+    private HTreeMap<String, BigDecimal> getTable() {
         if (db != null && !db.isClosed()) {
             return db
                     .hashMap(databaseConfig.getPortfolioDatabaseTable(), Serializer.STRING, Serializer.BIG_DECIMAL)
@@ -33,9 +57,5 @@ public class DatabaseImpl implements Database {
         } else {
             throw new IllegalStateException("DB is closed " + databaseConfig.toString());
         }
-    }
-
-    public void disconnect() {
-        db.close();
     }
 }

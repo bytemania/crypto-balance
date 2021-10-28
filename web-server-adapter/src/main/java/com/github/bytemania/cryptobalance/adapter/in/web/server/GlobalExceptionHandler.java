@@ -1,6 +1,6 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server;
 
-import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.ResponseError;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.common.ResponseError;
 import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.github.bytemania.cryptobalance.adapter.in.web.server.dto;
+package com.github.bytemania.cryptobalance.adapter.in.web.server.dto.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;

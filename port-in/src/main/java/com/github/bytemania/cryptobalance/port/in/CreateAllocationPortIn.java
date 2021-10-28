@@ -5,7 +5,7 @@ import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 
 import java.math.BigDecimal;
 
-public interface CreateAllocation {
+public interface CreateAllocationPortIn {
 
     AllocationResult allocate(Crypto stableCoin, BigDecimal amountToInvest, BigDecimal minAmountToAllocate);
 

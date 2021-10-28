@@ -1,9 +1,12 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server.impl;
 
-import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.Allocation;
-import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.Response;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.allocation.Allocation;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.allocation.Response;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.portfolio.Crypto;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.portfolio.GetPortfolio;
 import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -48,6 +51,32 @@ public class Mapper {
                 .stableCrypto(stableCrypto)
                 .cryptos(cryptos)
                 .build();
+    }
+
+    public static GetPortfolio fromCryptoStateList(String currency, List<CryptoState> cryptoStateList) {
+
+        var total = fromDouble(cryptoStateList.stream()
+                .map(CryptoState::getInvested)
+                .reduce(BigDecimal::add).orElse(BigDecimal.ZERO).doubleValue());
+
+        List<Crypto> cryptos = cryptoStateList.stream()
+                .map(cryptoState -> Crypto.builder()
+                        .symbol(cryptoState.getSymbol())
+                        .amountInvested(fromDouble(cryptoState.getInvested().doubleValue()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return GetPortfolio.builder()
+                .currency(currency)
+                .totalAmountInvested(total)
+                .cryptos(cryptos)
+                .build();
+    }
+
+    public static CryptoState fromCrypto(Crypto crypto) {
+        return CryptoState.of(
+                crypto.getSymbol(),
+                BigDecimal.valueOf(crypto.getAmountInvested()).setScale(2, RoundingMode.HALF_UP));
     }
 
     private static Allocation fromCryptoAllocation(CryptoAllocation cryptoAllocation) {
