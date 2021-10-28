@@ -20,13 +20,13 @@ class MapperTest {
     @DisplayName("Should translate an Allocation Result")
     void shouldTranslateAnAllocationResult() {
 
-        Response response = Mapper.fromAllocationResult("USD", Fixture.allocationResult);
+        Response response = Mapper.fromAllocationResult("USD", 10, Fixture.allocationResult);
 
         assertThat(response).isNotNull();
         assertThat(response.getCurrency()).isEqualTo("USD");
-        assertThat(response.getAmountToInvest()).isEqualTo(21.0);
+        assertThat(response.getAmountToInvest()).isEqualTo(10.0);
         assertThat(response.getRest()).isEqualTo(1.0);
-        assertThat(response.getAmountInvested()).isEqualTo(80.0);
+        assertThat(response.getAmountInvested()).isEqualTo(12.0);
         assertThat(response.getStableCrypto()).isEqualTo(
                 Allocation
                         .builder()
@@ -63,13 +63,13 @@ class MapperTest {
     @DisplayName("Should translate a Empty Allocation Result")
     void shouldTranslateAEmptyAllocationResult() {
 
-        var allocation = AllocationResult.of(BigDecimal.ONE, BigDecimal.ONE, List.of());
+        var allocation = AllocationResult.of(BigDecimal.valueOf(199), BigDecimal.ONE, List.of());
 
-        Response response = Mapper.fromAllocationResult("USD", allocation);
+        Response response = Mapper.fromAllocationResult("USD", 200, allocation);
 
         assertThat(response).isNotNull();
         assertThat(response.getCurrency()).isEqualTo("USD");
-        assertThat(response.getAmountToInvest()).isEqualTo(1.0);
+        assertThat(response.getAmountToInvest()).isEqualTo(200.0);
         assertThat(response.getRest()).isEqualTo(1.0);
         assertThat(response.getAmountInvested()).isEqualTo(0.0);
         assertThat(response.getStableCrypto()).isEqualTo(Allocation.builder().build());

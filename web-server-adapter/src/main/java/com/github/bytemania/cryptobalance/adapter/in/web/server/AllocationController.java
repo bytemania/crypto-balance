@@ -52,7 +52,7 @@ public class AllocationController {
 
         AllocationResult allocation = createAllocationPortIn.allocate(stableCoin, value, minValue);
 
-        return Mapper.fromAllocationResult(controllerConfig.getCurrency(), allocation);
+        return Mapper.fromAllocationResult(controllerConfig.getCurrency(), valueToInvest, allocation);
     }
 
 

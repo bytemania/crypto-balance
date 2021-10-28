@@ -18,18 +18,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Mapper {
 
-    public static Response fromAllocationResult(String currency, AllocationResult allocationResult) {
-        double amountToInvest = fromBigDecimal(allocationResult.getAmountToInvest());
+    public static Response fromAllocationResult(String currency, double valueToInvest, AllocationResult allocationResult) {
+        double totalAmount = fromBigDecimal(allocationResult.getAmountToInvest());
 
         double rest = fromBigDecimal(allocationResult.getRest());
 
-        double totalAmount = allocationResult.getCryptos().stream()
-                .map(CryptoAllocation::getAmountToInvest)
-                .reduce(BigDecimal::add)
-                .map(Mapper::fromBigDecimal)
-                .orElse(0.00);
-
-        double amountInvested = fromDouble(totalAmount - (amountToInvest - rest));
+        double amountInvested = fromDouble(totalAmount - (valueToInvest - rest));
 
         Allocation stableCrypto = allocationResult.getCryptos().stream()
                 .filter(CryptoAllocation::isStableCoin)
@@ -45,7 +39,7 @@ public class Mapper {
 
         return Response.builder()
                 .currency(currency)
-                .amountToInvest(amountToInvest)
+                .amountToInvest(valueToInvest)
                 .rest(rest)
                 .amountInvested(amountInvested)
                 .stableCrypto(stableCrypto)

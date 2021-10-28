@@ -75,7 +75,7 @@ class AllocationControllerItTest {
                         "\"currency\":\"USD\"," +
                         "\"amountToInvest\":21.0," +
                         "\"rest\":1.0," +
-                        "\"amountInvested\":80.0," +
+                        "\"amountInvested\":1," +
                         "\"stableCrypto\":{" +
                         "   \"symbol\":\"USDT\"," +
                         "   \"marketCapPercentage\":20.0," +
