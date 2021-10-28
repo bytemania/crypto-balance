@@ -1,6 +1,6 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server.impl;
 
-import com.github.bytemania.cryptobalance.adapter.in.web.server.AllocationControllerConfig;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.ControllerConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @NoArgsConstructor
 @Getter
 @ToString
-public class AllocationControllerConfigImpl implements AllocationControllerConfig {
+public class ControllerConfigImpl implements ControllerConfig {
 
     @Value("#{systemProperties['APP_CURRENCY'] ?: 'USD'}")
     String currency;

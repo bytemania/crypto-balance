@@ -1,4 +1,4 @@
-package com.github.bytemania.cryptobalance.adapter.in.web.server.dto;
+package com.github.bytemania.cryptobalance.adapter.in.web.server.dto.allocation;
 
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

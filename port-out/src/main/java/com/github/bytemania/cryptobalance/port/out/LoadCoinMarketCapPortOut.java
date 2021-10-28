@@ -4,6 +4,6 @@ import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 
 import java.util.List;
 
-public interface LoadCoinMarketCapPort {
+public interface LoadCoinMarketCapPortOut {
     List<Crypto> load();
 }

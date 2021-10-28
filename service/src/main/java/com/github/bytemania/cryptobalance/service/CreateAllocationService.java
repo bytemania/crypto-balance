@@ -5,9 +5,9 @@ import com.github.bytemania.cryptobalance.domain.balance_strategy.MarketCapAlloc
 import com.github.bytemania.cryptobalance.domain.dto.AllocationResult;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
-import com.github.bytemania.cryptobalance.port.in.CreateAllocation;
-import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPort;
-import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPort;
+import com.github.bytemania.cryptobalance.port.in.CreateAllocationPortIn;
+import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPortOut;
+import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPortOut;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,15 +17,15 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class CreateAllocationService implements CreateAllocation {
+public class CreateAllocationService implements CreateAllocationPortIn {
 
-    private final LoadCoinMarketCapPort loadCoinMarketCapPort;
-    private final LoadPortfolioPort loadPortfolioPort;
+    private final LoadCoinMarketCapPortOut loadCoinMarketCapPortOut;
+    private final LoadPortfolioPortOut loadPortfolioPortOut;
 
     @Autowired
-    public CreateAllocationService(LoadCoinMarketCapPort loadCoinMarketCapPort, LoadPortfolioPort loadPortfolioPort) {
-        this.loadCoinMarketCapPort = loadCoinMarketCapPort;
-        this.loadPortfolioPort = loadPortfolioPort;
+    public CreateAllocationService(LoadCoinMarketCapPortOut loadCoinMarketCapPortOut, LoadPortfolioPortOut loadPortfolioPortOut) {
+        this.loadCoinMarketCapPortOut = loadCoinMarketCapPortOut;
+        this.loadPortfolioPortOut = loadPortfolioPortOut;
     }
 
     @Override
@@ -34,8 +34,8 @@ public class CreateAllocationService implements CreateAllocation {
         log.info("Service Called for crypto stableCoin={}, amountToInvest={}, minAmountToAllocate={}",
                 stableCoin, amountToInvest, amountToInvest);
 
-        List<Crypto> cryptosFromCoinMarketCap = loadCoinMarketCapPort.load();
-        List<CryptoState> cryptosFromPortfolio = loadPortfolioPort.load();
+        List<Crypto> cryptosFromCoinMarketCap = loadCoinMarketCapPortOut.load();
+        List<CryptoState> cryptosFromPortfolio = loadPortfolioPortOut.load();
 
         BalanceStrategy balanceStrategy = MarketCapAllocation.of(
                         cryptosFromCoinMarketCap,

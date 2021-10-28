@@ -1,6 +1,6 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server;
 
-public interface AllocationControllerConfig {
+public interface ControllerConfig {
 
     String getCurrency();
 

@@ -3,7 +3,7 @@ package com.github.bytemania.cryptobalance.adapter.out.web.client;
 import com.github.bytemania.cryptobalance.adapter.out.web.client.exception.CoinMarketCapClientException;
 import com.github.bytemania.cryptobalance.adapter.out.web.client.impl.Mapper;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
-import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPort;
+import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPortOut;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class WebClientAdapter implements InitializingBean, LoadCoinMarketCapPort {
+public class WebClientAdapter implements InitializingBean, LoadCoinMarketCapPortOut {
 
     private final CoinMarketCapWebClient coinMarketCapWebClient;
 

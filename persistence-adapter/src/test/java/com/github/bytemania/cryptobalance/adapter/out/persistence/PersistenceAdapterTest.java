@@ -8,13 +8,14 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 
@@ -93,11 +94,101 @@ class PersistenceAdapterTest {
         assertThatThrownBy(persistenceAdapter::load).isInstanceOf(IllegalStateException.class);
         then(database).should(times(1)).load();
 
-
         Assertions.assertThat(logCaptor.getLogs())
                 .hasSize(1);
         Assertions.assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
                 .containsExactly("Fetching portfolio from the database");
     }
+
+    @Test
+    @DisplayName("Should update")
+    void shouldUpdate() {
+        ConcurrentMap<String, BigDecimal> cryptosToUpdate = new ConcurrentHashMap<>();
+        cryptosToUpdate.put("BTC", BigDecimal.TEN);
+        cryptosToUpdate.put("ETH", BigDecimal.ZERO);
+
+        persistenceAdapter.update(Set.of(
+                CryptoState.of("BTC", BigDecimal.TEN),
+                CryptoState.of("ETH", BigDecimal.ZERO)));
+
+        then(database).should(times(1)).update(eq(cryptosToUpdate));
+
+        Assertions.assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs().get(0))
+                .contains("Updating cryptos from Portfolio")
+                .contains("CryptoState(symbol=BTC, invested=10)")
+                .contains("CryptoState(symbol=ETH, invested=0)")
+                .hasSize(108);
+    }
+
+    @Test
+    @DisplayName("update should process an IllegalStateException")
+    void shouldUpdateOnError() {
+        ConcurrentMap<String, BigDecimal> expectedUpdateCryptos = new ConcurrentHashMap<>();
+        expectedUpdateCryptos.put("BTC", BigDecimal.TEN);
+        expectedUpdateCryptos.put("ETH", BigDecimal.ZERO);
+
+        willThrow(IllegalStateException.class).given(database).update(expectedUpdateCryptos);
+
+        Set<CryptoState> cryptosToUpdate = Set.of(
+                CryptoState.of("BTC", BigDecimal.TEN), CryptoState.of("ETH", BigDecimal.ZERO));
+        assertThatThrownBy(() -> persistenceAdapter.update(cryptosToUpdate))
+                .isInstanceOf(IllegalStateException.class);
+
+        Assertions.assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs().get(0))
+                .contains("Updating cryptos from Portfolio")
+                .contains("CryptoState(symbol=BTC, invested=10)")
+                .contains("CryptoState(symbol=ETH, invested=0)")
+                .hasSize(108);
+    }
+
+    @Test
+    @DisplayName("Should remove")
+    void shouldRemove() {
+        Set<String> cryptosToRemove = Set.of("ADA", "DOGE");
+
+        persistenceAdapter.remove(cryptosToRemove);
+
+        then(database).should(times(1)).remove(any(ConcurrentLinkedQueue.class));
+
+        Assertions.assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs().get(0))
+                .contains("Removing cryptos from Portfolio")
+                .contains("DOGE")
+                .contains("ADA")
+                .hasSize(44);
+    }
+
+    @Test
+    @DisplayName("Should remove on error")
+    void shouldRemoveOnError() {
+        Set<String> cryptosToRemove = Set.of("ADA", "DOGE");
+
+        willThrow(IllegalStateException.class).given(database).remove(any(ConcurrentLinkedQueue.class));
+
+        assertThatThrownBy(() -> persistenceAdapter.remove(cryptosToRemove))
+                .isInstanceOf(IllegalStateException.class);
+
+        Assertions.assertThat(logCaptor.getLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs())
+                .hasSize(1);
+        Assertions.assertThat(logCaptor.getInfoLogs().get(0))
+                .contains("Removing cryptos from Portfolio")
+                .contains("DOGE")
+                .contains("ADA")
+                .hasSize(44);
+    }
+
 }

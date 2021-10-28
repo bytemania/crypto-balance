@@ -2,7 +2,7 @@ package com.github.bytemania.cryptobalance.adapter.out.web.client;
 
 import com.github.bytemania.cryptobalance.adapter.out.web.client.impl.CoinMarketCapWebClientConfigImpl;
 import com.github.bytemania.cryptobalance.adapter.out.web.client.impl.CoinMarketCapWebClientImpl;
-import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPort;
+import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPortOut;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -59,7 +59,7 @@ class WebClientAdapterItTest {
     }
 
     @Autowired
-    private LoadCoinMarketCapPort webClientAdapter;
+    private LoadCoinMarketCapPortOut webClientAdapter;
 
     @Test
     @DisplayName("should create a WebClientAdapter")

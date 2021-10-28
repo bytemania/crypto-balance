@@ -15,13 +15,13 @@
         <dependency>
             <groupId>com.github.bytemania</groupId>
             <artifactId>port-in</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.github.bytemania</groupId>
             <artifactId>domain</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>

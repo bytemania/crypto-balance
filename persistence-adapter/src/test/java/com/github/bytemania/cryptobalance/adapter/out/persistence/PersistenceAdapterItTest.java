@@ -2,7 +2,7 @@ package com.github.bytemania.cryptobalance.adapter.out.persistence;
 
 import com.github.bytemania.cryptobalance.adapter.out.persistence.impl.DatabaseConfigImpl;
 import com.github.bytemania.cryptobalance.adapter.out.persistence.impl.DatabaseImpl;
-import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPort;
+import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPortOut;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,11 +37,11 @@ public class PersistenceAdapterItTest {
     }
 
     @Autowired
-    private LoadPortfolioPort persistenceAdapter;
+    private LoadPortfolioPortOut persistenceAdapter;
 
     @Test
     @DisplayName("PersistenceAdapter should be created")
-    void PersistenceAdapterShouldBeCreated() {
+    void persistenceAdapterShouldBeCreated() {
         assertThat(persistenceAdapter).isNotNull();
         persistenceAdapter.load();
     }
