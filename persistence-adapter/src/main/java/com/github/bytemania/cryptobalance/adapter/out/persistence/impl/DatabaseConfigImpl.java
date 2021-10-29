@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @ToString
 public class DatabaseConfigImpl implements DatabaseConfig {
-    @Value("#{systemProperties['DB_FILE'] ?: 'portfolio.db'}")
+    @Value("${DB_FILE:portfolio.db}")
     private String portfolioDatabaseFileName;
 
-    @Value("#{systemProperties['DB_MAP'] ?: 'portfolio'}")
+    @Value("${DB_MAP:portfolio}")
     private String portfolioDatabaseTable;
 }

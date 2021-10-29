@@ -15,18 +15,18 @@ import org.springframework.context.annotation.Configuration;
 @ToString
 public class CoinMarketCapWebClientConfigImpl implements CoinMarketCapWebClientConfig {
 
-    @Value("#{systemProperties['WEB_CLIENT_BASE_URL'] ?: 'https://pro-api.coinmarketcap.com/v1'}")
+    @Value("${WEB_CLIENT_BASE_URL:https://pro-api.coinmarketcap.com/v1}")
     private String baseUrl;
 
-    @Value("#{systemProperties['WEB_CLIENT_AUTH_KEY'] ?: 'UNKNOWN_KEY'}")
+    @Value("${WEB_CLIENT_AUTH_KEY:UNKNOWN_KEY}")
     private String authenticationKey;
 
-    @Value("#{systemProperties['WEB_CLIENT_TIMEOUT_MS'] ?: '90000'}")
+    @Value("${WEB_CLIENT_TIMEOUT_MS:90000}")
     private int timeoutMs;
 
-    @Value("#{systemProperties['WEB_CLIENT_NUMBER_OF_CRYPTOS'] ?: '100'}")
+    @Value("${WEB_CLIENT_NUMBER_OF_CRYPTOS:100}")
     int numberOfCryptos;
 
-    @Value("#{systemProperties['APP_CURRENCY'] ?: 'USD'}")
+    @Value("${APP_CURRENCY:USD}")
     String currency;
 }

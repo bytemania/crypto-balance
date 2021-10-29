@@ -34,3 +34,6 @@ build/
 
 .gitignore
 portfolio.db
+portfolio.json
+setenv.sh
+
