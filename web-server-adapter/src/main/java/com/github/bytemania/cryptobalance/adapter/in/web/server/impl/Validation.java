@@ -47,7 +47,7 @@ public final class Validation {
                 throw new ValidationException("All cryptos to update must have a defined symbol");
             }
 
-            if (crypto.getAmountInvested() <= 0.0) {
+            if (crypto.getAmountInvested() == null || crypto.getAmountInvested() <= 0.0) {
                 throw new ValidationException("All cryptos to update must have a positive amount to invest");
             }
         }

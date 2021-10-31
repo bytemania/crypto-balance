@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -34,10 +34,10 @@ public class CreateAllocationService implements CreateAllocationPortIn {
         log.info("Service Called for crypto stableCoin={}, amountToInvest={}, minAmountToAllocate={}",
                 stableCoin, amountToInvest, amountToInvest);
 
-        List<Crypto> cryptosFromCoinMarketCap = loadCoinMarketCapPortOut.load();
-        List<CryptoState> cryptosFromPortfolio = loadPortfolioPortOut.load();
+        Set<Crypto> cryptosFromCoinMarketCap = loadCoinMarketCapPortOut.load();
+        Set<CryptoState> cryptosFromPortfolio = loadPortfolioPortOut.load();
 
-        BalanceStrategy balanceStrategy = MarketCapAllocation.of(
+        BalanceStrategy balanceStrategy = new MarketCapAllocation(
                         cryptosFromCoinMarketCap,
                         stableCoin,
                         amountToInvest,

@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,13 +51,13 @@ class CreateAllocationServiceItTest {
     @DisplayName("Should Create Allocation")
     void shouldCreateAllocation() {
 
-        var coinMarketCap = List.of(Crypto.of("BTC", 55.57, false));
-        var state = List.of(CryptoState.of("BTC", BigDecimal.valueOf(100)));
+        var coinMarketCap = Set.of(new Crypto("BTC", 55.57, BigDecimal.ONE, false));
+        var state = Set.of(new CryptoState("BTC", BigDecimal.ONE, BigDecimal.valueOf(100)));
 
         given(loadCoinMarketCapPortOut.load()).willReturn(coinMarketCap);
         given(loadPortfolioPortOut.load()).willReturn(state);
 
-        var stableCrypto = Crypto.of("BUSD", 20.0, true);
+        var stableCrypto = new Crypto("BUSD", 20.0, BigDecimal.ZERO, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
@@ -68,10 +69,8 @@ class CreateAllocationServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
-                .containsExactly("Service Called for crypto " +
-                        "stableCoin=Crypto(symbol=BUSD, marketCapPercentage=20.0, stableCoin=true), " +
-                        "amountToInvest=100, " +
-                        "minAmountToAllocate=100");
+                .containsExactly("Service Called for crypto stableCoin=Crypto(symbol=BUSD, marketCapPercentage=20.0, " +
+                        "price=0, stableCoin=true), amountToInvest=100, minAmountToAllocate=100");
     }
 
     @Test
@@ -79,7 +78,7 @@ class CreateAllocationServiceItTest {
     void shouldFailIfCoinMarketCapFail() {
         given(loadCoinMarketCapPortOut.load()).willThrow(new IllegalStateException("Cannot connect CoinMarketCap"));
 
-        var stableCrypto = Crypto.of("BUSD", 20.0, true);
+        var stableCrypto = new Crypto("BUSD", 20.0, BigDecimal.ZERO, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
@@ -91,9 +90,8 @@ class CreateAllocationServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
-                .containsExactly("Service Called for crypto " +
-                        "stableCoin=Crypto(symbol=BUSD, marketCapPercentage=20.0, stableCoin=true), " +
-                        "amountToInvest=100, " +
+                .containsExactly("Service Called for crypto stableCoin=Crypto(symbol=BUSD, " +
+                        "marketCapPercentage=20.0, price=0, stableCoin=true), amountToInvest=100, " +
                         "minAmountToAllocate=100");
     }
 
@@ -101,12 +99,12 @@ class CreateAllocationServiceItTest {
     @DisplayName("Should Fail if Portfolio Fails")
     void shouldFailIfPortfolioFails() {
 
-        var coinMarketCap = List.of(Crypto.of("BTC", 55.57, false));
+        var coinMarketCap = List.of(new Crypto("BTC", 55.57, BigDecimal.ZERO, false));
 
-        given(loadCoinMarketCapPortOut.load()).willReturn(coinMarketCap);
+        given(loadCoinMarketCapPortOut.load()).willReturn(null);
         given(loadPortfolioPortOut.load()).willThrow(new IllegalStateException("Cannot Connect Portfolio"));
 
-        var stableCrypto = Crypto.of("BUSD", 20.0, true);
+        var stableCrypto = new Crypto("BUSD", 20.0, BigDecimal.ZERO, true);
         var amountToInvest = BigDecimal.valueOf(100);
         var minAmountToAllocate = BigDecimal.valueOf(25);
 
@@ -118,9 +116,8 @@ class CreateAllocationServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
-                .containsExactly("Service Called for crypto " +
-                        "stableCoin=Crypto(symbol=BUSD, marketCapPercentage=20.0, stableCoin=true), " +
-                        "amountToInvest=100, " +
+                .containsExactly("Service Called for crypto stableCoin=Crypto(symbol=BUSD, " +
+                        "marketCapPercentage=20.0, price=0, stableCoin=true), amountToInvest=100, " +
                         "minAmountToAllocate=100");
     }
 }

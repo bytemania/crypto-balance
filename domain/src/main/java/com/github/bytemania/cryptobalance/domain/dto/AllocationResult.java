@@ -3,11 +3,15 @@ package com.github.bytemania.cryptobalance.domain.dto;
 import lombok.Value;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
-@Value(staticConstructor = "of")
+@Value
 public class AllocationResult {
     BigDecimal amountToInvest;
+    BigDecimal holdings;
+    BigDecimal totalInvested;
     BigDecimal rest;
-    List<CryptoAllocation> cryptos;
+    BigDecimal minValueToAllocate;
+    CryptoAllocation stableCrypto;
+    Set<CryptoAllocation> cryptos;
 }

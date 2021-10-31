@@ -7,41 +7,26 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Fixture {
 
-    public static final List<CryptoState> cryptoState = List.of(
-            CryptoState.of("USDT", BigDecimal.valueOf(200)),
-            CryptoState.of("BTC", BigDecimal.valueOf(1000)));
+    public static final Set<CryptoState> cryptoState = Set.of(
+            new CryptoState("BUSD", BigDecimal.valueOf(200), BigDecimal.valueOf(200)),
+            new CryptoState("BTC", BigDecimal.valueOf(0.02), BigDecimal.valueOf(1000)));
 
-    public static final AllocationResult allocationResult = AllocationResult.of(
-            BigDecimal.valueOf(21.00),
-            BigDecimal.valueOf(1.00),
-            List.of(CryptoAllocation.of(
-                            "BTC",
-                            60,
-                            false,
-                            BigDecimal.valueOf(60),
-                            CryptoAllocation.Operation.BUY,
-                            BigDecimal.valueOf(20),
-                            BigDecimal.valueOf(40)),
-                    CryptoAllocation.of(
-                            "ADA",
-                            20,
-                            false,
-                            BigDecimal.valueOf(20),
-                            CryptoAllocation.Operation.KEEP,
-                            BigDecimal.valueOf(0),
-                            BigDecimal.valueOf(20)),
-                    CryptoAllocation.of(
-                            "USDT",
-                            20,
-                            true,
-                            BigDecimal.valueOf(20),
-                            CryptoAllocation.Operation.KEEP,
-                            BigDecimal.ZERO,
-                            BigDecimal.valueOf(20))));
+    public static final AllocationResult allocationResult = new AllocationResult(
+            BigDecimal.valueOf(200),
+            BigDecimal.valueOf(1201),
+            BigDecimal.valueOf(1200),
+            BigDecimal.ONE,
+            BigDecimal.valueOf(25),
+            new CryptoAllocation("BUSD", BigDecimal.ONE, BigDecimal.valueOf(121), BigDecimal.valueOf(200), 20, BigDecimal.valueOf(21)),
+            Set.of(
+                    new CryptoAllocation("DOGE", BigDecimal.valueOf(0.2), BigDecimal.valueOf(10), BigDecimal.valueOf(100), 15, BigDecimal.valueOf(30)),
+                    new CryptoAllocation("ADA", BigDecimal.valueOf(2), BigDecimal.valueOf(220), BigDecimal.valueOf(450), 28, BigDecimal.valueOf(-40)),
+                    new CryptoAllocation("BTC", BigDecimal.valueOf(65000), BigDecimal.valueOf(0.001), BigDecimal.valueOf(650), 55, BigDecimal.valueOf(20))
+            ));
 
 }

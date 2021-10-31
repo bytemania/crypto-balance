@@ -103,8 +103,8 @@ public class AcceptanceTest {
                 .content("{" +
                         "  \"currency\":\"USD\"," +
                         "  \"cryptosToUpdate\": [" +
-                        "      {\"symbol\": \"BTC\", \"amountInvested\": 100}," +
-                        "      {\"symbol\": \"ETH\", \"amountInvested\": 50}" +
+                        "      {\"symbol\": \"BTC\", \"holding\":0.002, \"amountInvested\": 100}," +
+                        "      {\"symbol\": \"ETH\", \"holding\":0.02, \"amountInvested\": 50}" +
                         "    ]" +
                         "}"))
                 .andDo(print())
@@ -115,8 +115,8 @@ public class AcceptanceTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":150.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"BTC\",\"amountInvested\":100.0}," +
-                                "       {\"symbol\":\"ETH\",\"amountInvested\":50.0}" +
+                                "       {\"symbol\":\"BTC\", \"holding\":0.002, \"amountInvested\":100.0}," +
+                                "       {\"symbol\":\"ETH\", \"holding\":0.02, \"amountInvested\":50.0}" +
                                 "    ]" +
                                 "}"));
 
@@ -130,8 +130,8 @@ public class AcceptanceTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":150.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"BTC\",\"amountInvested\":100.0}," +
-                                "       {\"symbol\":\"ETH\",\"amountInvested\":50.0}" +
+                                "       {\"symbol\":\"BTC\", \"holding\":0.002, \"amountInvested\":100.0}," +
+                                "       {\"symbol\":\"ETH\", \"holding\":0.02, \"amountInvested\":50.0}" +
                                 "    ]" +
                                 "}"));
 
@@ -145,61 +145,57 @@ public class AcceptanceTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(
-                        "{" +
-                                "  \"currency\":\"USD\"," +
-                                "  \"amountToInvest\":200.0," +
-                                "  \"rest\":0.0," +
-                                "  \"amountInvested\":150.0," +
-                                "  \"stableCrypto\":{" +
-                                "    \"symbol\":\"USDT\"," +
-                                "    \"marketCapPercentage\":20.0," +
-                                "    \"amountToInvest\":70.0," +
-                                "    \"operation\":\"BUY\"," +
-                                "    \"rebalanceToInvest\":70.0," +
-                                "    \"currentInvested\":0.0}," +
-                                "  \"cryptos\":[" +
-                                "    {" +
-                                "      \"symbol\":\"BTC\"," +
-                                "      \"marketCapPercentage\":46.16," +
-                                "      \"amountToInvest\":161.56," +
-                                "      \"operation\":\"BUY\"," +
-                                "      \"rebalanceToInvest\":61.56," +
-                                "      \"currentInvested\":100.0" +
-                                "    }," +
-                                "    {" +
-                                "      \"symbol\":\"ETH\"," +
-                                "      \"marketCapPercentage\":18.77," +
-                                "      \"amountToInvest\":65.7," +
-                                "      \"operation\":\"BUY\"," +
-                                "      \"rebalanceToInvest\":15.7," +
-                                "      \"currentInvested\":50.0" +
-                                "    }," +
-                                "    {" +
-                                "      \"symbol\":\"ADA\"," +
-                                "      \"marketCapPercentage\":7.0," +
-                                "      \"amountToInvest\":25.0," +
-                                "      \"operation\":\"BUY\"," +
-                                "      \"rebalanceToInvest\":25.0," +
-                                "      \"currentInvested\":0.0" +
-                                "    }," +
-                                "    {" +
-                                "      \"symbol\":\"BNB\"," +
-                                "      \"marketCapPercentage\":7.0," +
-                                "      \"amountToInvest\":25.0," +
-                                "      \"operation\":\"BUY\"," +
-                                "      \"rebalanceToInvest\":25.0," +
-                                "      \"currentInvested\":0.0" +
-                                "    }," +
-                                "    {" +
-                                "      \"symbol\":\"SOL\"," +
-                                "      \"marketCapPercentage\":0.78," +
-                                "      \"amountToInvest\":2.75," +
-                                "      \"operation\":\"BUY\"," +
-                                "      \"rebalanceToInvest\":2.75," +
-                                "      \"currentInvested\":0.0" +
-                                "    }" +
-                                "  ]" +
-                                "}"
+                        "{ " +
+                        "       \"currency\":\"USD\", " +
+                        "       \"amountToInvest\":200.00, " +
+                        "       \"holdings\":206.87, " +
+                        "       \"totalInvested\":150.00, " +
+                        "       \"rest\":11.34, " +
+                        "       \"minValueToAllocate\":25.00, " +
+                        "       \"stableCrypto\":{ " +
+                        "           \"symbol\":\"USDT\", " +
+                        "           \"price\":1.00, " +
+                        "           \"holding\":0.00, " +
+                        "           \"invested\":0.00, " +
+                        "           \"marketCapPercentage\":20.0, " +
+                        "           \"rebalance\":81.37 " +
+                        "        }, " +
+                        "        \"cryptos\": " +
+                        "            [ " +
+                        "                { " +
+                        "                    \"symbol\":\"BTC\", " +
+                        "                    \"price\":62712.61, " +
+                        "                    \"holding\":0.00, " +
+                        "                    \"invested\":100.00, " +
+                        "                    \"marketCapPercentage\":46.1577, " +
+                        "                    \"rebalance\":62.38 " +
+                        "                }, " +
+                        "                { " +
+                        "                    \"symbol\":\"ETH\", " +
+                        "                    \"price\":4072.10, " +
+                        "                    \"holding\":0.02, " +
+                        "                    \"invested\":50.00, " +
+                        "                    \"marketCapPercentage\":18.765, " +
+                        "                    \"rebalance\":-5.09 " +
+                        "                }, " +
+                        "                { " +
+                        "                    \"symbol\":\"BNB\", " +
+                        "                    \"price\":473.65, " +
+                        "                    \"holding\":0.00, " +
+                        "                    \"invested\":0.00, " +
+                        "                    \"marketCapPercentage\":3.0848, " +
+                        "                    \"rebalance\":25.00 " +
+                        "                }, " +
+                        "                { " +
+                        "                    \"symbol\":\"ADA\", " +
+                        "                    \"price\":2.15, " +
+                        "                    \"holding\":0.00, " +
+                        "                    \"invested\":0.00, " +
+                        "                    \"marketCapPercentage\":2.7677, " +
+                        "                    \"rebalance\":25.00 " +
+                        "                } " +
+                        "            ] " +
+                        "}"
                 ));
     }
 

@@ -1,6 +1,5 @@
 package com.github.bytemania.cryptobalance.adapter.out.persistence;
 
-import com.github.bytemania.cryptobalance.adapter.out.persistence.impl.Mapper;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import com.github.bytemania.cryptobalance.port.out.LoadPortfolioPortOut;
 import com.github.bytemania.cryptobalance.port.out.RemovePortfolioPortOut;
@@ -11,9 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,25 +41,25 @@ class PersistenceAdapter implements InitializingBean,
     }
 
     @Override
-    public List<CryptoState> load() {
+    public Set<CryptoState> load() {
         log.info("Fetching portfolio from the database");
-        return database.load().entrySet().stream()
-                .map(Mapper::fromEntry)
-                .collect(Collectors.toList());
+        return database.load().stream()
+                .map(DatabaseMapper.INSTANCE::cryptoRowToCryptoState)
+                .collect(Collectors.toSet());
     }
 
     @Override
     public void remove(Set<String> cryptosToRemove) {
         log.info("Removing cryptos from Portfolio: {}", cryptosToRemove);
-        var concurrentLinkedQueue = new ConcurrentLinkedQueue<>(cryptosToRemove);
-        database.remove(concurrentLinkedQueue);
+        database.remove(cryptosToRemove);
     }
 
     @Override
     public void update(Set<CryptoState> cryptosToUpdate) {
         log.info("Updating cryptos from Portfolio: {}", cryptosToUpdate);
-        var concurrentHashMap = cryptosToUpdate.stream()
-                .collect(Collectors.toConcurrentMap(CryptoState::getSymbol, CryptoState::getInvested));
-        database.update(concurrentHashMap);
+        var cryptos = cryptosToUpdate.stream()
+                .map(DatabaseMapper.INSTANCE::cryptoStateToCryptoRow)
+                .collect(Collectors.toSet());
+        database.update(cryptos);
     }
 }

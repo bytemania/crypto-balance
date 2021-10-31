@@ -2,7 +2,7 @@ package com.github.bytemania.cryptobalance.adapter.in.web.server;
 
 import com.github.bytemania.cryptobalance.adapter.in.web.server.dto.portfolio.Crypto;
 import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.ControllerConfigImpl;
-import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.Mapper;
+import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import com.github.bytemania.cryptobalance.port.in.LoadPortfolioPortIn;
 import com.github.bytemania.cryptobalance.port.in.UpdatePortfolioPortIn;
 import nl.altindag.log.LogCaptor;
@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,7 +75,7 @@ class PortfolioControllerItTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":1200.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"USDT\",\"amountInvested\":200.0}," +
+                                "       {\"symbol\":\"BUSD\",\"amountInvested\":200.0}," +
                                 "       {\"symbol\":\"BTC\",\"amountInvested\":1000.0}" +
                                 "    ]" +
                                 "}"));
@@ -123,8 +124,8 @@ class PortfolioControllerItTest {
                         .content("{" +
                                  "  \"currency\":\"USD\"," +
                                  "  \"cryptosToUpdate\": [" +
-                                 "      {\"symbol\": \"BTC\", \"amountInvested\": 20.5}," +
-                                 "      {\"symbol\": \"ETH\", \"amountInvested\": 10}" +
+                                 "      {\"symbol\": \"BTC\", \"holding\":0.001, \"amountInvested\": 20.5}," +
+                                 "      {\"symbol\": \"ETH\", \"holding\":0.01, \"amountInvested\": 10}" +
                                  "    ]," +
                                  "  \"cryptosToRemove\": [\"DOGE\", \"DOT\"]" +
                                  "}"))
@@ -136,8 +137,8 @@ class PortfolioControllerItTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":1200.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"USDT\",\"amountInvested\":200.0}," +
-                                "       {\"symbol\":\"BTC\",\"amountInvested\":1000.0}" +
+                                "       {\"symbol\":\"BUSD\", \"holding\":200, \"amountInvested\":200.00}," +
+                                "       {\"symbol\":\"BTC\", \"holding\":0.02, \"amountInvested\":1000.00}" +
                                 "    ]" +
                                 "}"));
 
@@ -145,17 +146,17 @@ class PortfolioControllerItTest {
                 .should(times(1))
                 .update(
                         eq(Set.of(
-                            Mapper.fromCrypto(Crypto.builder().symbol("BTC").amountInvested(20.5).build()),
-                            Mapper.fromCrypto(Crypto.builder().symbol("ETH").amountInvested(10).build()))),
+                                new CryptoState("BTC", BigDecimal.valueOf(0.001), BigDecimal.valueOf(20.5)),
+                                new CryptoState("ETH", BigDecimal.valueOf(0.01), BigDecimal.valueOf(10.0)))),
                         eq(Set.of("DOGE", "DOT")));
 
         assertThat(logCaptor.getLogs())
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
-                .containsExactly("update portfolio with values:UpdatePortfolio(currency=USD, " +
-                        "cryptosToUpdate=[Crypto(symbol=BTC, amountInvested=20.5), " +
-                        "Crypto(symbol=ETH, amountInvested=10.0)], cryptosToRemove=[DOT, DOGE])");
+                .containsExactly("update portfolio with values:UpdatePortfolio(currency=USD, cryptosToUpdate=[" +
+                        "Crypto(symbol=BTC, holding=0.001, amountInvested=20.5), " +
+                        "Crypto(symbol=ETH, holding=0.01, amountInvested=10.0)], cryptosToRemove=[DOT, DOGE])");
     }
 
     @Test
@@ -169,8 +170,8 @@ class PortfolioControllerItTest {
                         .content("{" +
                                 "  \"currency\":\"USD\"," +
                                 "  \"cryptosToUpdate\": [" +
-                                "      {\"symbol\": \"BTC\", \"amountInvested\": 20.5}," +
-                                "      {\"symbol\": \"ETH\", \"amountInvested\": 10}" +
+                                "      {\"symbol\": \"BTC\", \"holding\":0.001, \"amountInvested\": 20.5}," +
+                                "      {\"symbol\": \"ETH\", \"holding\":0.01, \"amountInvested\": 10}" +
                                 "    ]" +
                                 "}"))
                 .andDo(print())
@@ -181,8 +182,8 @@ class PortfolioControllerItTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":1200.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"USDT\",\"amountInvested\":200.0}," +
-                                "       {\"symbol\":\"BTC\",\"amountInvested\":1000.0}" +
+                                "       {\"symbol\":\"BUSD\", \"holding\":200, \"amountInvested\":200.0}," +
+                                "       {\"symbol\":\"BTC\", \"holding\":0.02, \"amountInvested\":1000.0}" +
                                 "    ]" +
                                 "}"));
 
@@ -190,17 +191,17 @@ class PortfolioControllerItTest {
                 .should(times(1))
                 .update(
                         eq(Set.of(
-                                Mapper.fromCrypto(Crypto.builder().symbol("BTC").amountInvested(20.5).build()),
-                                Mapper.fromCrypto(Crypto.builder().symbol("ETH").amountInvested(10).build()))),
+                                WebServerMapper.INSTANCE.cryptoToCryptoState(Crypto.builder().symbol("BTC").amountInvested(20.5).build()),
+                                WebServerMapper.INSTANCE.cryptoToCryptoState(Crypto.builder().symbol("ETH").amountInvested(10.0).build()))),
                         eq(Set.of()));
 
         assertThat(logCaptor.getLogs())
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs())
                 .hasSize(1)
-                .containsExactly("update portfolio with values:UpdatePortfolio(currency=USD, " +
-                        "cryptosToUpdate=[Crypto(symbol=BTC, amountInvested=20.5), " +
-                        "Crypto(symbol=ETH, amountInvested=10.0)], cryptosToRemove=null)");
+                .containsExactly("update portfolio with values:UpdatePortfolio(currency=USD, cryptosToUpdate=[" +
+                        "Crypto(symbol=BTC, holding=0.001, amountInvested=20.5), " +
+                        "Crypto(symbol=ETH, holding=0.01, amountInvested=10.0)], cryptosToRemove=null)");
     }
 
     @Test
@@ -223,7 +224,7 @@ class PortfolioControllerItTest {
                                 "   \"currency\":\"USD\"," +
                                 "   \"totalAmountInvested\":1200.0," +
                                 "   \"cryptos\":[" +
-                                "       {\"symbol\":\"USDT\",\"amountInvested\":200.0}," +
+                                "       {\"symbol\":\"BUSD\",\"amountInvested\":200.0}," +
                                 "       {\"symbol\":\"BTC\",\"amountInvested\":1000.0}" +
                                 "    ]" +
                                 "}"));

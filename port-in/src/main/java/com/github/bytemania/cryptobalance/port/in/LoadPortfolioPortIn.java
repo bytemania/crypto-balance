@@ -2,8 +2,8 @@ package com.github.bytemania.cryptobalance.port.in;
 
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 
-import java.util.List;
+import java.util.Set;
 
 public interface LoadPortfolioPortIn {
-    List<CryptoState> load();
+    Set<CryptoState> load();
 }

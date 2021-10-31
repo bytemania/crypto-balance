@@ -1,7 +1,6 @@
 package com.github.bytemania.cryptobalance.adapter.out.web.client;
 
 import com.github.bytemania.cryptobalance.adapter.out.web.client.exception.CoinMarketCapClientException;
-import com.github.bytemania.cryptobalance.adapter.out.web.client.impl.Mapper;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.port.out.LoadCoinMarketCapPortOut;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -29,10 +28,10 @@ public class WebClientAdapter implements InitializingBean, LoadCoinMarketCapPort
     }
 
     @Override
-    public List<Crypto> load() {
+    public Set<Crypto> load() {
         try {
             log.info("Fetching crypto cap from Coin Market Cap Web Client");
-            return Mapper.fromListing(coinMarketCapWebClient.doGet());
+            return CoinMarketCapMapper.INSTANCE.listingToCryptos(coinMarketCapWebClient.doGet());
         } catch (CoinMarketCapClientException e) {
             log.warn("Error getting crypto cap from Coin Market Cap Web Client");
             throw new IllegalStateException(e);

@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -31,7 +30,7 @@ public class PortfolioService implements LoadPortfolioPortIn, UpdatePortfolioPor
     }
 
     @Override
-    public List<CryptoState> load() {
+    public Set<CryptoState> load() {
         log.info("Portfolio Service load");
         return loadPortfolioPortOut.load();
     }

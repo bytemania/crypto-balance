@@ -18,4 +18,5 @@ import lombok.extern.jackson.Jacksonized;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class QuoteDetail {
     double marketCapDominance;
+    double price;
 }

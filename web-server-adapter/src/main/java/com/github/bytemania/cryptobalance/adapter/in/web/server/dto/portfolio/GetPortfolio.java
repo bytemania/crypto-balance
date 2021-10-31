@@ -1,5 +1,7 @@
 package com.github.bytemania.cryptobalance.adapter.in.web.server.dto.portfolio;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.github.bytemania.cryptobalance.adapter.in.web.server.impl.MoneySerializer;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -15,6 +17,9 @@ import java.util.List;
 @SuperBuilder
 public class GetPortfolio {
     String currency;
-    double totalAmountInvested;
+
+    @JsonSerialize(using = MoneySerializer.class)
+    Double totalAmountInvested;
+
     List<Crypto> cryptos;
 }

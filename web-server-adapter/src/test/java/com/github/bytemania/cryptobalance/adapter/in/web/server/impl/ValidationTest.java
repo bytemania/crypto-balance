@@ -118,7 +118,7 @@ class ValidationTest {
                 Validation.updatePortfolio("usd",
                         UpdatePortfolio.builder()
                                 .currency("USD")
-                                .cryptosToUpdate(Set.of(Crypto.builder().symbol("BTC").amountInvested(0).build()))
+                                .cryptosToUpdate(Set.of(Crypto.builder().symbol("BTC").amountInvested(0.0).build()))
                                 .cryptosToRemove(Set.of())
                                 .build()))
                 .isInstanceOf(ValidationException.class)
@@ -128,7 +128,7 @@ class ValidationTest {
                 Validation.updatePortfolio("usd",
                         UpdatePortfolio.builder()
                                 .currency("USD")
-                                .cryptosToUpdate(Set.of(Crypto.builder().symbol("BTC").amountInvested(-1).build()))
+                                .cryptosToUpdate(Set.of(Crypto.builder().symbol("BTC").amountInvested(-1.0).build()))
                                 .cryptosToRemove(Set.of())
                                 .build()))
                 .isInstanceOf(ValidationException.class)

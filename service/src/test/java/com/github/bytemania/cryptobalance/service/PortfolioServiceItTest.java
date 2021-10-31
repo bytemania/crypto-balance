@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +51,7 @@ class PortfolioServiceItTest {
     @Test
     @DisplayName("Should load the Portfolio")
     void shouldLoadThePortfolio() {
-        var cryptos = List.of(CryptoState.of("ETH", BigDecimal.TEN));
+        var cryptos = Set.of(new CryptoState("ETH", BigDecimal.ZERO, BigDecimal.TEN));
 
         given(loadPortfolioPortOut.load()).willReturn(cryptos);
 
@@ -71,8 +70,6 @@ class PortfolioServiceItTest {
     @Test
     @DisplayName("Should process Error on load the Portfolio")
     void shouldProcessErrorOnLoadThePortfolio() {
-        var cryptos = List.of(CryptoState.of("ETH", BigDecimal.TEN));
-
         given(loadPortfolioPortOut.load()).willThrow(new IllegalStateException("DB ERROR"));
 
         assertThatThrownBy(() -> portfolioService.load())
@@ -89,8 +86,8 @@ class PortfolioServiceItTest {
     @Test
     @DisplayName("Should update the Portfolio")
     void shouldUpdateThePortfolio() {
-        var cryptosToUpdate = Set.of(CryptoState.of("BTC", BigDecimal.ONE),
-                CryptoState.of("ADA", BigDecimal.TEN));
+        var cryptosToUpdate = Set.of(new CryptoState("BTC", BigDecimal.ONE, BigDecimal.ONE),
+                new CryptoState("ADA", BigDecimal.valueOf(6),BigDecimal.TEN));
 
         var cryptosToRemove = Set.of("DOGE", "ETH");
 
@@ -105,18 +102,18 @@ class PortfolioServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs().get(0))
                 .contains("Portfolio Service Collection cryptosToUpdate")
-                .contains("CryptoState(symbol=ADA, invested=10)")
-                .contains("CryptoState(symbol=BTC, invested=1)")
+                .contains("CryptoState(symbol=ADA, holding=6, invested=10)")
+                .contains("CryptoState(symbol=BTC, holding=1, invested=1)")
                 .contains("ETH")
                 .contains("DOGE")
-                .hasSize(149);
+                .hasSize(171);
     }
 
     @Test
     @DisplayName("Should fail UpdatePortfolio Fails")
     void shouldFailIfUpdatePortfolioFails() {
-        var cryptosToUpdate = Set.of(CryptoState.of("BTC", BigDecimal.ONE),
-                CryptoState.of("ADA", BigDecimal.TEN));
+        var cryptosToUpdate = Set.of(new CryptoState("BTC", BigDecimal.ZERO, BigDecimal.ONE),
+                new CryptoState("ADA", BigDecimal.ZERO, BigDecimal.TEN));
 
         var cryptosToRemove = Set.of("DOGE", "ETH");
 
@@ -134,18 +131,18 @@ class PortfolioServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs().get(0))
                 .contains("Portfolio Service Collection cryptosToUpdate")
-                .contains("CryptoState(symbol=ADA, invested=10)")
-                .contains("CryptoState(symbol=BTC, invested=1)")
+                .contains("CryptoState(symbol=ADA, holding=0, invested=10)")
+                .contains("CryptoState(symbol=BTC, holding=0, invested=1)")
                 .contains("ETH")
                 .contains("DOGE")
-                .hasSize(149);
+                .hasSize(171);
     }
 
     @Test
     @DisplayName("Should fail RemovePortfolio Fails")
     void shouldFailIfRemovePortfolioFails() {
-        var cryptosToUpdate = Set.of(CryptoState.of("BTC", BigDecimal.ONE),
-                CryptoState.of("ADA", BigDecimal.TEN));
+        var cryptosToUpdate = Set.of(new CryptoState("BTC", BigDecimal.ZERO, BigDecimal.ONE),
+                new CryptoState("ADA", BigDecimal.ZERO, BigDecimal.TEN));
 
         var cryptosToRemove = Set.of("DOGE", "ETH");
 
@@ -163,11 +160,11 @@ class PortfolioServiceItTest {
                 .hasSize(1);
         assertThat(logCaptor.getInfoLogs().get(0))
                 .contains("Portfolio Service Collection cryptosToUpdate")
-                .contains("CryptoState(symbol=ADA, invested=10)")
-                .contains("CryptoState(symbol=BTC, invested=1)")
+                .contains("CryptoState(symbol=ADA, holding=0, invested=10)")
+                .contains("CryptoState(symbol=BTC, holding=0, invested=1)")
                 .contains("ETH")
                 .contains("DOGE")
-                .hasSize(149);
+                .hasSize(171);
     }
 
 }

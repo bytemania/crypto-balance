@@ -5,9 +5,13 @@ import lombok.Value;
 
 import java.math.BigDecimal;
 
-@Value(staticConstructor = "of")
+@Value
 public class CryptoState {
     String symbol;
+
+    @EqualsAndHashCode.Exclude
+    BigDecimal holding;
+
     @EqualsAndHashCode.Exclude
     BigDecimal invested;
 }

@@ -70,6 +70,7 @@ public class Fixture {
                                                     .quoteDetail(QuoteDetail
                                                             .builder()
                                                             .marketCapDominance(46.2667)
+                                                            .price(100.4)
                                                             .build())
                                                     .build())
                                             .build(),
@@ -89,6 +90,7 @@ public class Fixture {
                                                     .quoteDetail(QuoteDetail
                                                             .builder()
                                                             .marketCapDominance(2.7144)
+                                                            .price(20.34563)
                                                             .build())
                                                     .build())
                                             .build()

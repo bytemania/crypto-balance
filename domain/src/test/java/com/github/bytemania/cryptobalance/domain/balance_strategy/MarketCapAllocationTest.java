@@ -3,13 +3,10 @@ package com.github.bytemania.cryptobalance.domain.balance_strategy;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,24 +16,12 @@ class MarketCapAllocationTest {
 
     private static MarketCapAllocation createMarketCapAllocation(
             double stableCoinPercentage,
-            double minValueToAllocate) {
-
-        return createMarketCapAllocation(
-                stableCoinPercentage,
-                100,
-                minValueToAllocate,
-                createMarketCap(),
-                List.of());
-    }
-
-    private static MarketCapAllocation createMarketCapAllocation(
-            double stableCoinPercentage,
             double amountToInvest,
             double minValueToAllocate,
-            List<Crypto> marketCap,
-            List<CryptoState> currentState) {
+            Set<Crypto> marketCap,
+            Set<CryptoState> currentState) {
         Crypto stable = createStableCrypto(stableCoinPercentage);
-        return MarketCapAllocation.of(
+        return new MarketCapAllocation(
                 marketCap,
                 stable,
                 BigDecimal.valueOf(amountToInvest),
@@ -44,208 +29,175 @@ class MarketCapAllocationTest {
                 currentState);
     }
 
-    private static List<Crypto> createMarketCap() {
-        Crypto btc = Crypto.of("BTC", 55.57, false);
-        Crypto eth = Crypto.of("ETH", 28.03, false);
-        Crypto ada = Crypto.of("ADA", 8.38, false);
-        Crypto bnb = Crypto.of("BNB", 4.02, false);
-        Crypto tether = Crypto.of("USDT", 2.00, true);
-        Crypto ripple = Crypto.of("XRP", 1.00, false);
+    private static Set<Crypto> createMarketCap() {
+        Crypto btc = new Crypto("BTC", 55.57, BigDecimal.valueOf(60500), false);
+        Crypto eth = new Crypto("ETH", 28.03, BigDecimal.valueOf(4200), false);
+        Crypto ada = new Crypto("ADA", 8.38, BigDecimal.valueOf(1.93), false);
+        Crypto bnb = new Crypto("BNB", 4.02, BigDecimal.valueOf(520), false);
+        Crypto tether = new Crypto("USDT", 1.00, BigDecimal.ONE, true);
+        Crypto ripple = new Crypto("XRP", 1.00, BigDecimal.valueOf(1.10), false);
+        Crypto busd = new Crypto("BUSD", 1.00, BigDecimal.valueOf(1.01), true);
 
-        return List.of(btc, eth, ada, bnb, tether, ripple);
+        return Set.of(btc, eth, ada, bnb, tether, ripple, busd);
     }
 
     private static Crypto createStableCrypto(double stableCoinPercentage) {
-        return Crypto.of("BUSD", stableCoinPercentage, true);
-    }
-
-    private static CryptoAllocation createAllocation(String symbol,
-                                                     double marketCapPercentage,
-                                                     boolean isStableCoin,
-                                                     double amountToInvest) {
-        return CryptoAllocation.of(symbol,
-                marketCapPercentage,
-                isStableCoin,
-                BigDecimal.valueOf(amountToInvest),
-                CryptoAllocation.Operation.KEEP,
-                BigDecimal.ZERO,
-                BigDecimal.ZERO);
-    }
-
-    private static void assertRebalance(List<CryptoAllocation> allocations, List<CryptoState> state, double minToInvest) {
-
-        Map<String, BigDecimal> currentState = state.stream()
-                .collect(Collectors.toMap(CryptoState::getSymbol, CryptoState::getInvested));
-
-        var totalInvested = 100 + currentState.values().stream()
-                .map(BigDecimal::doubleValue)
-                .reduce(Double::sum).get();
-
-        for (var allocation: allocations) {
-            String symbol = allocation.getSymbol();
-            double amountToInvest = allocation.getAmountToInvest().doubleValue();
-            double alreadyInvested = currentState.getOrDefault(symbol, BigDecimal.ZERO).doubleValue();
-            double cap = allocation.getMarketCapPercentage();
-
-            var isAmountExpected = Math.abs(amountToInvest - cap / 100 * totalInvested) < 0.01
-                    || amountToInvest == minToInvest;
-
-            CryptoAllocation.Operation expectedOperation;
-            if (Math.abs(amountToInvest - alreadyInvested) <= 0.001) expectedOperation = CryptoAllocation.Operation.KEEP;
-            else if (amountToInvest - alreadyInvested < 0) expectedOperation = CryptoAllocation.Operation.SELL;
-            else expectedOperation = CryptoAllocation.Operation.BUY;
-
-            assertThat(allocation.getCurrentInvested().doubleValue()).isCloseTo(alreadyInvested, Offset.offset(0.001));
-            assertThat(isAmountExpected).isTrue();
-            assertThat(allocation.getRebalanceInvestment().doubleValue())
-                    .isCloseTo(Math.abs(amountToInvest - alreadyInvested), Offset.offset(0.01));
-            assertThat(allocation.getRebalanceOperation()).isEqualTo(expectedOperation);
-        }
+        return new Crypto("BUSD", stableCoinPercentage, BigDecimal.ONE, true);
     }
 
     @Test
-    @DisplayName("Should allocate all to stableCoin if amount to invest is lower than minimum")
-    void shouldAllocateAllToStableCoinIfAmountToInvestIsLowerThanMinimum() {
-        var moreMinThanAmountToInvest = createMarketCapAllocation(20, 1000);
-        assertThat(moreMinThanAmountToInvest.allocate().getCryptos()).isEqualTo(List.of(
-                createAllocation("BUSD", 100, true,100)));
+    @DisplayName("no state and no cap")
+    void noStateAndNoCap() {
+        var allocator = createMarketCapAllocation(20, 200, 25, Set.of(), Set.of());
 
-        var sameAmountToInvestThanMin = createMarketCapAllocation(20, 100);
-        assertThat(sameAmountToInvestThanMin.allocate().getCryptos()).isEqualTo(List.of(
-                createAllocation("BUSD", 100, true, 100)));
+        var result = allocator.allocate();
+
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(0);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(160.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, 20.0, new BigDecimal("40.00")).toString());
+        assertThat(result.getCryptos()).isEmpty();
     }
 
     @Test
-    @DisplayName("Should full allocate if the stable and the list get 100% allocation and money is left")
-    void shouldAllocateAllCoinsAndMoneyIsLeft() {
-        var fullyAllocation = createMarketCapAllocation(2, 1);
-        assertThat(fullyAllocation.allocate().getCryptos()).containsExactly(
-                createAllocation("BTC", 55.57, false, 55.57),
-                createAllocation("ETH", 28.03, false, 28.03),
-                createAllocation("ADA", 8.38, false, 8.38),
-                createAllocation("BNB", 4.02, false, 4.02),
-                createAllocation("BUSD", 2.0, true, 2.00),
-                createAllocation("XRP", 1.0, false, 1.00)
-        );
+    @DisplayName("State and No Cap")
+    void stateAndNoCap() {
+        var allocator = createMarketCapAllocation(20, 200, 25, Set.of(),
+                Set.of(
+                        new CryptoState("BTC", BigDecimal.valueOf(0.002), BigDecimal.valueOf(1000)),
+                        new CryptoState("ETH", BigDecimal.valueOf(0.2), BigDecimal.valueOf(700)),
+                        new CryptoState("BUSD", BigDecimal.valueOf(700), BigDecimal.valueOf(700))
+                ));
 
-        var allocatedPercentage = fullyAllocation.allocate().getCryptos().stream()
-                .map(CryptoAllocation::getMarketCapPercentage)
-                .reduce(Double::sum)
-                .get();
+        var result = allocator.allocate();
 
-        var amountInvested = fullyAllocation.allocate().getCryptos().stream()
-                .map(CryptoAllocation::getAmountToInvest)
-                .reduce(BigDecimal::add)
-                .get();
-
-        assertThat(allocatedPercentage).isCloseTo(99, Offset.offset(0.001));
-        assertThat(amountInvested).isCloseTo(BigDecimal.valueOf(99), Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(fullyAllocation.getRest()).isCloseTo(BigDecimal.ONE, Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(fullyAllocation.allocate().getRest()).isCloseTo(BigDecimal.ONE, Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(fullyAllocation.allocate().getAmountToInvest()).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(fullyAllocation.allocate().getCryptos().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(2400.0);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(2400.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(2080.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(25.0);
+        assertThat(result.getStableCrypto()).isEqualTo(new CryptoAllocation("BUSD", new BigDecimal("1.01"), BigDecimal.valueOf(700), BigDecimal.valueOf(700), 20.0, BigDecimal.valueOf(-180.0)));
+        assertThat(result.getCryptos().stream().map(CryptoAllocation::toString).collect(Collectors.toSet()))
+                .hasSize(2)
+                .containsExactlyInAnyOrder(
+                        new CryptoAllocation("BTC", BigDecimal.ZERO, new BigDecimal("0.002"), new BigDecimal("1000"), 0, new BigDecimal("-1000")).toString(),
+                        new CryptoAllocation("ETH", BigDecimal.ZERO, new BigDecimal("0.2"), new BigDecimal("700"), 0, new BigDecimal("-700")).toString());
     }
 
     @Test
-    @DisplayName("Should full allocate Part of Portfolio")
-    void shouldAllocatePartOfPortfolio() {
-        var partialAllocation = createMarketCapAllocation(20, 10);
-        assertThat(partialAllocation.allocate().getCryptos()).containsExactly(
-                createAllocation("BTC", 55.57, false, 55.57),
-                createAllocation("ETH", 24.43, false, 24.43),
-                createAllocation("BUSD", 20.0, true, 20.00)
-        );
+    @DisplayName("MinValueToAllocate Bigger Than Amount To Invest Without Cap or State")
+    void minValueToAllocateBiggerThanAmountToInvestWithoutCapOrState() {
+        var allocator = createMarketCapAllocation(20, 200, 250, Set.of(), Set.of());
 
-        var allocatedPercentage = partialAllocation.allocate().getCryptos().stream()
-                .map(CryptoAllocation::getMarketCapPercentage)
-                .reduce(Double::sum)
-                .get();
+        var result = allocator.allocate();
 
-        var amountInvested = partialAllocation.allocate().getCryptos().stream()
-                .map(CryptoAllocation::getAmountToInvest)
-                .reduce(BigDecimal::add)
-                .get();
-
-        assertThat(allocatedPercentage).isEqualTo(100);
-        assertThat(amountInvested).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(partialAllocation.getRest()).isEqualTo(BigDecimal.ZERO);
-        assertThat(partialAllocation.allocate().getRest()).isCloseTo(BigDecimal.ZERO, Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(partialAllocation.allocate().getAmountToInvest()).isCloseTo(BigDecimal.valueOf(100), Offset.offset(BigDecimal.valueOf(0.001)));
-        assertThat(partialAllocation.allocate().getCryptos().stream().filter(CryptoAllocation::isStableCoin).count()).isEqualTo(1);
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(0);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(250.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO, 20.0, BigDecimal.ZERO).toString());
+        assertThat(result.getCryptos()).isEmpty();
     }
 
     @Test
-    @DisplayName("Should fully allocate and rebalance")
-    void shouldFullyAllocateAndRebalance() {
-        var cap = createMarketCap();
-        var state = List.of(
-                CryptoState.of("BTC", BigDecimal.valueOf(100)),
-                CryptoState.of("ETH", BigDecimal.valueOf(100)),
-                CryptoState.of("ADA", BigDecimal.valueOf(100)),
-                CryptoState.of("BUSD", BigDecimal.valueOf(10))
-            );
+    @DisplayName("MinValueToAllocate Bigger Than Amount To Invest Without Cap")
+    void minValueToAllocateBiggerThanAmountToInvest() {
+        var allocator = createMarketCapAllocation(20, 200, 250,
+                Set.of(new Crypto("BUSD", 1.03, BigDecimal.ONE, true)),
+                Set.of(new CryptoState("BUSD", BigDecimal.TEN, BigDecimal.TEN)));
 
-        var marketCapAllocation = createMarketCapAllocation(2, 100, 1, cap, state);
-        var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations.getCryptos(), state, 1);
+        var result = allocator.allocate();
+
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(10.0);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(10.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(210.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(250.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.TEN, 20.0, BigDecimal.ZERO).toString());
+        assertThat(result.getCryptos()).isEmpty();
     }
 
     @Test
-    @DisplayName("Should partial allocate and rebalance")
-    void shouldPartialAllocateAndRebalance() {
-        var cap = createMarketCap();
-        var state = List.of(
-                CryptoState.of("BTC", BigDecimal.valueOf(100)),
-                CryptoState.of("ETH", BigDecimal.valueOf(100)),
-                CryptoState.of("ADA", BigDecimal.valueOf(10)),
-                CryptoState.of("BUSD", BigDecimal.valueOf(10)),
-                CryptoState.of("XRP", BigDecimal.valueOf(90))
-        );
+    @DisplayName("partial allocation with no state")
+    void partialAllocationWithNoState() {
+        var allocator = createMarketCapAllocation(20, 200, 25,
+                createMarketCap(),
+                Set.of());
 
-        var marketCapAllocation = createMarketCapAllocation(20, 100, 10, cap, state);
-        var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations.getCryptos(), state, 1);
+        var result = allocator.allocate();
+
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(25.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", new BigDecimal("1.01"), BigDecimal.ZERO, BigDecimal.ZERO, 20.0, new BigDecimal("40.00")).toString());
+        assertThat(result.getCryptos().stream().map(CryptoAllocation::toString).collect(Collectors.toSet()))
+                .hasSize(2)
+                .contains(new CryptoAllocation("BTC", BigDecimal.valueOf(60500), BigDecimal.ZERO, BigDecimal.ZERO, 55.57, new BigDecimal("111.14000")).toString())
+                .contains(new CryptoAllocation("ETH", BigDecimal.valueOf(4200), BigDecimal.ZERO, BigDecimal.ZERO, 28.03, new BigDecimal("48.86000")).toString());
     }
 
     @Test
-    @DisplayName("Only buy stable if theres no cap")
-    void shouldOnlyByStableIfNoCap() {
-        var cap = List.<Crypto>of();
-        var state = List.of(
-                CryptoState.of("BTC", BigDecimal.valueOf(100)),
-                CryptoState.of("ETH", BigDecimal.valueOf(100)),
-                CryptoState.of("ADA", BigDecimal.valueOf(10)),
-                CryptoState.of("BUSD", BigDecimal.valueOf(10)),
-                CryptoState.of("XRP", BigDecimal.valueOf(90))
-        );
+    @DisplayName("partial allocation")
+    void partialAllocation() {
+        var allocator = createMarketCapAllocation(20, 200, 25,
+                createMarketCap(),
+                Set.of(
+                        new CryptoState("ETH", BigDecimal.valueOf(0.2), BigDecimal.valueOf(700)),
+                        new CryptoState("BUSD", BigDecimal.valueOf(20), BigDecimal.valueOf(20))
+                ));
 
-        var marketCapAllocation = createMarketCapAllocation(20, 100, 10, cap, state);
-        var allocations =  marketCapAllocation.allocate();
-        assertRebalance(allocations.getCryptos(), state, 1);
-        assertThat(allocations.getCryptos().get(0)).isEqualTo(CryptoAllocation.of("BUSD", 20.0, true,
-                BigDecimal.valueOf(82.00), CryptoAllocation.Operation.BUY, BigDecimal.valueOf(72.00),
-                BigDecimal.valueOf(10.00)));
-        assertThat(allocations.getCryptos().subList(1, allocations.getCryptos().size() - 1).stream()
-                .map(CryptoAllocation::getRebalanceOperation)
-                .collect(Collectors.toSet())).isEqualTo(Set.of(CryptoAllocation.Operation.SELL));
+        var result = allocator.allocate();
+
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(860.2);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(720.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(25.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", BigDecimal.valueOf(1.01), BigDecimal.valueOf(20), BigDecimal.valueOf(20), 20.0, new BigDecimal("191.840")).toString());
+        assertThat(result.getCryptos().stream().map(CryptoAllocation::toString).collect(Collectors.toSet()))
+                .hasSize(2)
+                .containsExactlyInAnyOrder(
+                        new CryptoAllocation("BTC", BigDecimal.valueOf(60500), BigDecimal.ZERO, BigDecimal.ZERO, 55.57, new BigDecimal("589.153140")).toString(),
+                        new CryptoAllocation("ETH", BigDecimal.valueOf(4200), BigDecimal.valueOf(0.2), BigDecimal.valueOf(700), 28.03, new BigDecimal("-580.993140")).toString());
     }
 
     @Test
-    @DisplayName("Keep the money if is already there")
-    void shouldKeepTheInvestmentIfIsInTheState() {
-        var cap = List.of(Crypto.of("BUSD", 100, false));
-        var state = List.of(CryptoState.of("BUSD", BigDecimal.valueOf(100)));
+    @DisplayName("fully allocation")
+    void fullAllocation() {
+        var allocator = createMarketCapAllocation(3, 200, 1,
+                createMarketCap(),
+                Set.of(
+                        new CryptoState("ETH", BigDecimal.valueOf(0.02), BigDecimal.valueOf(750)),
+                        new CryptoState("BUSD", BigDecimal.valueOf(50), BigDecimal.valueOf(50))
+                ));
 
-        var marketCapAllocation = createMarketCapAllocation(100, 0, 10, cap, state);
-        var allocations =  marketCapAllocation.allocate();
-        assertThat(allocations.getCryptos().size()).isEqualTo(1);
-        var allocation = allocations.getCryptos().get(0);
-        assertThat(allocation.getSymbol()).isEqualTo("BUSD");
-        assertThat(allocation.getMarketCapPercentage()).isEqualTo(100);
-        assertThat(allocation.isStableCoin()).isTrue();
-        assertThat(allocation.getAmountToInvest().doubleValue()).isEqualTo(100);
-        assertThat(allocation.getRebalanceOperation()).isEqualTo(CryptoAllocation.Operation.KEEP);
-        assertThat(allocation.getRebalanceInvestment().doubleValue()).isEqualTo(0);
-        assertThat(allocation.getCurrentInvested().doubleValue()).isEqualTo(100);
+        var result = allocator.allocate();
+
+        assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
+        assertThat(result.getHoldings().doubleValue()).isEqualTo(134.50);
+        assertThat(result.getTotalInvested().doubleValue()).isEqualTo(800.0);
+        assertThat(result.getRest().doubleValue()).isEqualTo(0.0);
+        assertThat(result.getMinValueToAllocate().doubleValue()).isEqualTo(1.0);
+        assertThat(result.getStableCrypto().toString())
+                .isEqualTo(new CryptoAllocation("BUSD", BigDecimal.valueOf(1.01), BigDecimal.valueOf(50), BigDecimal.valueOf(50), 3.0, new BigDecimal("-40.4650")).toString());
+        assertThat(result.getCryptos())
+                .hasSize(5)
+                .containsExactlyInAnyOrder(
+                        new CryptoAllocation("BNB", BigDecimal.valueOf(520), BigDecimal.ZERO, BigDecimal.ZERO, 4.02, new BigDecimal("13.4468999999999966550")),
+                        new CryptoAllocation("XRP", BigDecimal.valueOf(1.1), BigDecimal.ZERO, BigDecimal.ZERO, 1.0, new BigDecimal("3.3450")),
+                        new CryptoAllocation("ETH", BigDecimal.valueOf(4200), new BigDecimal("0.02"), new BigDecimal("750"), 28.03, new BigDecimal("9.760350")),
+                        new CryptoAllocation("ADA", BigDecimal.valueOf(1.93), BigDecimal.ZERO, BigDecimal.ZERO, 8.38, new BigDecimal("28.0311000000000033450")),
+                        new CryptoAllocation("BTC", BigDecimal.valueOf(60500), BigDecimal.ZERO, BigDecimal.ZERO, 55.57, new BigDecimal("185.881650"))
+                );
     }
+
 }

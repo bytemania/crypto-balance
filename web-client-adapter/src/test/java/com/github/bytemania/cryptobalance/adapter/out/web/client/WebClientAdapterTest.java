@@ -8,7 +8,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,13 +54,13 @@ class WebClientAdapterTest {
     @DisplayName("Should process and translate the data received from Coin Market Cap")
     void shouldProcessAndTranslateTheDataReceivedFromCoinMarketCap() throws CoinMarketCapClientException {
         given(coinMarketCapWebClient.doGet()).willReturn(Fixture.A_VALID_LISTING);
-        List<Crypto> cryptos = webClientAdapter.load();
+        Set<Crypto> cryptos = webClientAdapter.load();
 
         assertThat(cryptos)
                 .hasSize(2)
                 .containsExactly(
-                        Crypto.of("BTC", 46.27, false),
-                        Crypto.of("USDT", 2.71, true));
+                        new Crypto("BTC", 46.27, BigDecimal.ZERO, false),
+                        new Crypto("USDT", 2.71, BigDecimal.ZERO, true));
 
        assertThat(logCaptor.getLogs())
                 .hasSize(1);
