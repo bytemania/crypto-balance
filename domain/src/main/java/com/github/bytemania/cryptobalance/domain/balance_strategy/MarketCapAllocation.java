@@ -7,12 +7,14 @@ import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @EqualsAndHashCode
 @ToString
 public class MarketCapAllocation implements BalanceStrategy {
@@ -59,8 +61,11 @@ public class MarketCapAllocation implements BalanceStrategy {
         BigDecimal holdings = currentAllocation.stream()
                 .map(cryptoState -> {
                     if (indexedCrypto.containsKey(cryptoState.getSymbol()) && !cryptoState.getHolding().equals(BigDecimal.ZERO)) {
-                        return cryptoState.getHolding().multiply(indexedCrypto.get(cryptoState.getSymbol()).getPrice());
+                        var price = indexedCrypto.get(cryptoState.getSymbol()).getPrice();
+                        return cryptoState.getHolding().multiply(price);
                     } else {
+                        log.warn("Could not find price for coin {}. Please increment WEB_CLIENT_NUMBER_OF_CRYPTOS property",
+                                cryptoState.getSymbol());
                         return cryptoState.getInvested();
                     }
                 })

@@ -91,7 +91,7 @@ class AllocationControllerItTest {
                         "               {" +
                         "                    \"symbol\":\"BTC\"," +
                         "                    \"price\":65000.00," +
-                        "                    \"holding\":0.00," +
+                        "                    \"holding\":0.001," +
                         "                    \"invested\":650.00, " +
                         "                    \"marketCapPercentage\":55.0," +
                         "                    \"rebalance\":20.00" +

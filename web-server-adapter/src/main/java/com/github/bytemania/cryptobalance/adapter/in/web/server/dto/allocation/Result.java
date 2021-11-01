@@ -21,8 +21,7 @@ public class Result {
     @JsonSerialize(using = MoneySerializer.class)
     Double amountToInvest;
 
-    @JsonSerialize(using = MoneySerializer.class)
-    Double holdings;
+    double holdings;
 
     @JsonSerialize(using = MoneySerializer.class)
     Double totalInvested;

@@ -148,7 +148,7 @@ public class AcceptanceTest {
                         "{ " +
                         "       \"currency\":\"USD\", " +
                         "       \"amountToInvest\":200.00, " +
-                        "       \"holdings\":206.87, " +
+                        "       \"holdings\":206.86727571019503, " +
                         "       \"totalInvested\":150.00, " +
                         "       \"rest\":11.34, " +
                         "       \"minValueToAllocate\":25.00, " +
@@ -165,7 +165,7 @@ public class AcceptanceTest {
                         "                { " +
                         "                    \"symbol\":\"BTC\", " +
                         "                    \"price\":62712.61, " +
-                        "                    \"holding\":0.00, " +
+                        "                    \"holding\":0.002, " +
                         "                    \"invested\":100.00, " +
                         "                    \"marketCapPercentage\":46.1577, " +
                         "                    \"rebalance\":62.38 " +

@@ -3,8 +3,8 @@ package com.github.bytemania.cryptobalance.domain.balance_strategy;
 import com.github.bytemania.cryptobalance.domain.dto.Crypto;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoAllocation;
 import com.github.bytemania.cryptobalance.domain.dto.CryptoState;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import nl.altindag.log.LogCaptor;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -13,6 +13,18 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MarketCapAllocationTest {
+
+    private static LogCaptor logCaptor;
+
+    @BeforeAll
+    static void beforeAll() {
+        logCaptor = LogCaptor.forClass(MarketCapAllocation.class);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        logCaptor.close();
+    }
 
     private static MarketCapAllocation createMarketCapAllocation(
             double stableCoinPercentage,
@@ -43,6 +55,11 @@ class MarketCapAllocationTest {
 
     private static Crypto createStableCrypto(double stableCoinPercentage) {
         return new Crypto("BUSD", stableCoinPercentage, BigDecimal.ONE, true);
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        logCaptor.clearLogs();
     }
 
     @Test
@@ -198,6 +215,21 @@ class MarketCapAllocationTest {
                         new CryptoAllocation("ADA", BigDecimal.valueOf(1.93), BigDecimal.ZERO, BigDecimal.ZERO, 8.38, new BigDecimal("28.0311000000000033450")),
                         new CryptoAllocation("BTC", BigDecimal.valueOf(60500), BigDecimal.ZERO, BigDecimal.ZERO, 55.57, new BigDecimal("185.881650"))
                 );
+    }
+
+    @Test
+    @DisplayName("price not found for state crypto")
+    void priceNotFoundForStateCrypto() {
+        var allocator = createMarketCapAllocation(3, 200, 1,
+                createMarketCap(),
+                Set.of(new CryptoState("SHIB", BigDecimal.valueOf(20000000), BigDecimal.valueOf(120))));
+
+         allocator.allocate();
+
+         assertThat(logCaptor.getLogs()).hasSize(1);
+        assertThat(logCaptor.getWarnLogs())
+                .hasSize(1)
+                .contains("Could not find price for coin SHIB. Please increment WEB_CLIENT_NUMBER_OF_CRYPTOS property");
     }
 
 }

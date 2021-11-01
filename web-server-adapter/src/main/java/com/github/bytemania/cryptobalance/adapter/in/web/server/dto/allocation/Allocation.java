@@ -25,8 +25,7 @@ public class Allocation implements Comparable<Allocation> {
     Double price;
 
     @EqualsAndHashCode.Exclude
-    @JsonSerialize(using = MoneySerializer.class)
-    Double holding;
+    double holding;
 
     @EqualsAndHashCode.Exclude
     @JsonSerialize(using = MoneySerializer.class)

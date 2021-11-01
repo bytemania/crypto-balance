@@ -76,7 +76,7 @@ class WebServerMapperTest {
         assertThat(result).isNotNull();
         assertThat(result.getCurrency()).isEqualTo("USD");
         assertThat(result.getAmountToInvest().doubleValue()).isEqualTo(200.0);
-        assertThat(result.getHoldings().doubleValue()).isEqualTo(1201.0);
+        assertThat(result.getHoldings()).isEqualTo(1201.0);
         assertThat(result.getTotalInvested().doubleValue()).isEqualTo(1200.0);
         assertThat(result.getRest().doubleValue()).isEqualTo(1.0);
         assertThat(result.getMinValueToAllocate()).isEqualTo(25.0);
@@ -92,7 +92,7 @@ class WebServerMapperTest {
         assertThat(resultWithoutAllocation).isNotNull();
         assertThat(resultWithoutAllocation.getCurrency()).isEqualTo("USD");
         assertThat(resultWithoutAllocation.getAmountToInvest()).isNull();
-        assertThat(resultWithoutAllocation.getHoldings()).isNull();
+        assertThat(resultWithoutAllocation.getHoldings()).isZero();
         assertThat(resultWithoutAllocation.getTotalInvested()).isNull();
         assertThat(resultWithoutAllocation.getRest()).isNull();
         assertThat(resultWithoutAllocation.getMinValueToAllocate()).isNull();
